@@ -317,7 +317,7 @@ function ChatbotContent() {
         const formData = new FormData();
         formData.append("file", blob, "audio.webm");
         try {
-          const res = await fetch("http://localhost:8000/chat/transcribe", {
+          const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/chat/transcribe`, {
             method: "POST",
             headers: { Authorization: `Bearer ${localStorage.getItem("ember_token")}` },
             body: formData,
