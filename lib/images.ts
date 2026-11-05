@@ -11,23 +11,18 @@ export const WELCOME_SLIDES: WelcomeSlide[] = [
     title: "Reach the top, together",
     text: "Every check-in is a step. Every teammate counts.",
   },
-  { type: "posters", images: ["/grow.jpg", "/Speed.jpg", "/team1.jpg"] },
+  { type: "posters", images: ["/Success.jpg", "/together.jpg", "/just.jpg"] },
 ];
 
 export const LOGIN_POSTERS: string[] = [
   "/vision.jpg",
   "/time.jpg",
-  "/progress.jpg",
-  "/team1.jpg",
-  "/direction.jpg",
-  "/wancha.jpg",
+  "/learn.jpg",
+  "/equal.jpg",
 ];
 
 export const SIGNUP_POSTERS: string[] = [
-  "/New Day.jpg",
-  "/team1.jpg",
-  "/time.jpg",
-  "/vision.jpg",
   "/progress.jpg",
-  "/Speed.jpg",
+  "/team1.jpg",
+  "/direction.jpg",
 ];

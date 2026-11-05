@@ -40,7 +40,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen bg-paper">
-      {/* Top bar */}
+      {}
       <header className="sticky top-0 z-10 bg-paper border-b border-hairline flex items-center justify-between px-5 py-3 shadow-sm gap-4">
         <div className="flex items-center gap-2.5 shrink-0">
           <Logo size={32} />
@@ -60,7 +60,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       </header>
 
       <div className="flex flex-col md:flex-row">
-        {/* Sidebar */}
+        {}
         <aside className="md:w-60 md:min-h-[calc(100vh-57px)] border-b md:border-b-0 md:border-r border-hairline flex flex-col justify-between">
           <nav className="flex md:flex-col p-3 gap-1 overflow-x-auto md:overflow-visible">
             {NAV.map(({ href, label, icon: Icon }) => {

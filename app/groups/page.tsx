@@ -3,11 +3,10 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Plus, Archive, CheckCircle2 } from "lucide-react";
-import RequireAuth from "@/components/RequireAuth";
 import { api } from "@/lib/api";
 import type { Group } from "@/lib/types";
 
-function GroupsContent() {
+export default function GroupsPage() {
   const [groups, setGroups] = useState<Group[] | null>(null);
 
   useEffect(() => {
@@ -67,13 +66,5 @@ function GroupsContent() {
         </div>
       )}
     </div>
-  );
-}
-
-export default function GroupsPage() {
-  return (
-    <RequireAuth>
-      <GroupsContent />
-    </RequireAuth>
   );
 }

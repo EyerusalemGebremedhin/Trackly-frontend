@@ -63,7 +63,7 @@ function InsightSlide() {
       <rect x="60" y="40" width="380" height="120" rx="10" fill="#FFFFFF" stroke="#E5E1E3" strokeWidth="1.5" />
       <circle cx="94" cy="70" r="12" fill="#2E0219" />
       <path d="M89 70 l3 4 l8 -9" stroke="#FFFFFF" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-      <text x="116" y="66" fontFamily="Georgia, serif" fontSize="13" fill="#2E0219">AI insight</text>
+      <text x="116" y="66" fontFamily="Georgia, serif" fontSize="13" fill="#2E0219">Insight</text>
       <rect x="86" y="88" width="330" height="7" rx="3.5" fill="#F4E7EA" />
       <rect x="86" y="102" width="280" height="7" rx="3.5" fill="#F4E7EA" />
       <rect x="86" y="124" width="150" height="18" rx="9" fill="#EAF5EE" />

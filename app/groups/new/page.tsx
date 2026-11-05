@@ -2,82 +2,144 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import RequireAuth from "@/components/RequireAuth";
-import { api, ApiError } from "@/lib/api";
-import type { Group, PeriodType } from "@/lib/types";
+import { api } from "@/lib/api";
+import { Plus, X } from "lucide-react";
 
-function NewGroupContent() {
+export default function NewGroupPage() {
   const router = useRouter();
-  const [name, setName] = useState("");
-  const [cadence, setCadence] = useState<PeriodType>("weekly");
+  const [form, setForm] = useState({ name: "", checkin_cadence: "weekly" });
+  const [members, setMembers] = useState([{ email: "", role: "", reason: "" }]);
   const [error, setError] = useState<string | null>(null);
-  const [submitting, setSubmitting] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  function addMemberRow() {
+    setMembers([...members, { email: "", role: "", reason: "" }]);
+  }
+
+  function removeMemberRow(i: number) {
+    if (members.length === 1) return;
+    setMembers(members.filter((_, idx) => idx !== i));
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
-    setSubmitting(true);
+    setLoading(true);
     try {
-      const group = await api.post<Group>("/groups", { name, checkin_cadence: cadence });
-      router.push(`/groups/${group.id}`);
-    } catch (err) {
-      setError(err instanceof ApiError ? err.message : "Couldn't create that group.");
-      setSubmitting(false);
+      const g = await api.post<{ id: number }>("/groups", form);
+      for (const m of members) {
+        if (m.email.trim()) {
+          try {
+          await api.post(`/groups/${g.id}/invite`, { email: m.email.trim(), role: m.role || "member" });
+          } catch (err) {
+            try {
+              await api.post(`/groups/${g.id}/members`, { email: m.email.trim(), role: m.role || "member" });
+            } catch {}
+          }
+        }
+      }
+      router.push(`/groups/${g.id}`);
+    } catch (err: any) {
+      setError(err?.message || "Failed to create group");
+    } finally {
+      setLoading(false);
     }
   }
 
   return (
-    <div className="max-w-md">
-      <h1 className="font-serif text-3xl text-accent mb-1">New group</h1>
-      <p className="text-sm text-muted mb-6">You'll automatically become its lead.</p>
+    <div className="max-w-2xl">
+      <div className="mb-6">
+        <h1 className="text-2xl sm:text-3xl font-bold" style={{ fontFamily: 'var(--font-serif)' }}>Create new team</h1>
+        <p className="text-text-secondary mt-1">Start collaborating with your team</p>
+      </div>
 
-      <form onSubmit={handleSubmit} className="bg-surface border border-hairline rounded-md p-5 space-y-4">
+      <form onSubmit={handleSubmit} className="bg-surface border border-border rounded-xl p-6 space-y-4">
         {error && (
-          <div className="text-sm bg-danger-bg text-danger border-l-4 border-danger px-3 py-2 rounded">
+          <div className="text-sm bg-red-500/10 text-red-500 border border-red-500/20 px-4 py-3 rounded-lg">
             {error}
           </div>
         )}
 
         <div>
-          <label className="block text-sm text-ink mb-1">Group name</label>
+          <label className="block text-sm font-medium mb-2">Team name</label>
           <input
+            value={form.name}
+            onChange={(e) => setForm({ ...form, name: e.target.value })}
             required
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="e.g. Graduation Project, Engineering team"
-            className="w-full border border-hairline rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+            className="w-full px-3 py-2.5 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary/50"
+            placeholder="Enter team name"
           />
         </div>
 
         <div>
-          <label className="block text-sm text-ink mb-1">Check-in cadence</label>
+          <label className="block text-sm font-medium mb-2">Check-in cadence</label>
           <select
-            value={cadence}
-            onChange={(e) => setCadence(e.target.value as PeriodType)}
-            className="w-full border border-hairline rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+            value={form.checkin_cadence}
+            onChange={(e) => setForm({ ...form, checkin_cadence: e.target.value })}
+            className="w-full px-3 py-2.5 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary/50"
           >
             <option value="daily">Daily</option>
             <option value="weekly">Weekly</option>
-            <option value="sprint">Sprint</option>
+            <option value="biweekly">Biweekly</option>
           </select>
         </div>
 
-        <button
-          type="submit"
-          disabled={submitting}
-          className="bg-primary hover:bg-primary-hover text-white rounded-md px-4 py-2 text-sm font-medium transition-colors disabled:opacity-60"
-        >
-          {submitting ? "Creating…" : "Create group"}
-        </button>
+        <div className="pt-4 border-t border-border">
+          <div className="flex items-center justify-between mb-3">
+            <label className="block text-sm font-medium">Add members (emails)</label>
+            <button type="button" onClick={addMemberRow} className="flex items-center gap-1 text-sm text-primary hover:underline">
+              <Plus size={16} /> Add another
+            </button>
+          </div>
+          <div className="space-y-3">
+            {members.map((m, i) => (
+              <div key={i} className="grid grid-cols-1 sm:grid-cols-12 gap-2 items-start">
+                <input
+                  type="email"
+                  value={m.email}
+                  onChange={(e) => {
+                    const copy = [...members];
+                    copy[i].email = e.target.value;
+                    setMembers(copy);
+                  }}
+                  placeholder="member@example.com"
+                  className="sm:col-span-4 px-3 py-2 border border-border rounded-lg bg-background text-sm"
+                />
+                <input
+                  value={m.role}
+                  onChange={(e) => {
+                    const copy = [...members];
+                    copy[i].role = e.target.value;
+                    setMembers(copy);
+                  }}
+                  placeholder="Role (free text, e.g. Developer)"
+                  className="sm:col-span-7 px-3 py-2 border border-border rounded-lg bg-background text-sm"
+                />
+                <button type="button" onClick={() => removeMemberRow(i)} className="sm:col-span-1 p-2 text-muted hover:text-danger">
+                  <X size={16} />
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex gap-3 pt-4">
+          <button
+            type="button"
+            onClick={() => router.back()}
+            className="px-4 py-2 border border-border rounded-lg hover:bg-background transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            disabled={loading}
+            className="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-hover transition-colors disabled:opacity-50"
+          >
+            {loading ? "Creating..." : "Create Team"}
+          </button>
+        </div>
       </form>
     </div>
-  );
-}
-
-export default function NewGroupPage() {
-  return (
-    <RequireAuth>
-      <NewGroupContent />
-    </RequireAuth>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { api, ApiError } from "@/lib/api";
 import type { PeriodType } from "@/lib/types";
 
@@ -24,6 +24,19 @@ export default function CheckinForm({
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
+  const [groups, setGroups] = useState<any[]>([]);
+  const [scope, setScope] = useState<string>(groupId ? String(groupId) : "individual");
+
+  useEffect(() => {
+    if (groupId) {
+      setScope(String(groupId));
+      return;
+    }
+    api
+      .get<any[]>("/groups")
+      .then((res) => setGroups(res || []))
+      .catch(() => setGroups([]));
+  }, [groupId]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -31,7 +44,7 @@ export default function CheckinForm({
     setSubmitting(true);
     try {
       await api.post("/checkins", {
-        group_id: groupId ?? null,
+        group_id: scope === "individual" ? null : groupId ? groupId : isNaN(Number(scope)) ? scope : Number(scope),
         goal: goal || null,
         achieved,
         went_well: wentWell || null,
@@ -66,6 +79,22 @@ export default function CheckinForm({
       {error && (
         <div className="text-sm bg-danger-bg text-danger border-l-4 border-danger px-3 py-2 rounded">
           {error}
+        </div>
+      )}
+
+      {!groupId && groups.length > 0 && (
+        <div>
+          <label className="block text-sm text-ink mb-1">This check-in is for</label>
+          <select
+            value={scope}
+            onChange={(e) => setScope(e.target.value)}
+            className="border border-hairline rounded px-2 py-1.5 bg-paper text-ink"
+          >
+            <option value="individual">Individual</option>
+            {groups.map((g: any) => (
+              <option key={g.id} value={g.id}>{g.name}</option>
+            ))}
+          </select>
         </div>
       )}
 

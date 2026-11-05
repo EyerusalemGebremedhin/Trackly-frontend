@@ -172,9 +172,9 @@ function CompletedContent() {
   }, [visible]);
 
   const scopeGroup = groupId ? groups[groupId] : null;
-  const fromGroups = searchParams.get("from") === "groups";
-  const backHref = groupId ? `/groups/${groupId}` : fromGroups ? "/groups" : "/dashboard";
-  const backLabel = groupId ? "Back to the group" : fromGroups ? "Back to groups" : "Back to my progress";
+  const backHref = groupId ? `/groups/${groupId}` : "/dashboard";
+  const backLabel = groupId ? "Back to the group" : "Back to my progress";
+
   return (
     <div>
       <div className="mb-6">

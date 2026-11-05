@@ -3,7 +3,7 @@ export default function HeroIllustration() {
     <svg viewBox="0 0 480 420" className="w-full h-auto" role="img" aria-label="A weekly check-in card next to a rising progress chart">
       <circle cx="240" cy="210" r="200" fill="#F4E7EA" />
 
-      {/* Check-in card */}
+      {}
       <g>
         <rect x="60" y="70" width="230" height="200" rx="10" fill="#FFFFFF" stroke="#E9DEE1" strokeWidth="1.5" />
         <rect x="60" y="70" width="230" height="40" rx="10" fill="#450920" />
@@ -22,7 +22,7 @@ export default function HeroIllustration() {
         <text x="175" y="245" textAnchor="middle" fontFamily="Inter, sans-serif" fontSize="11" fill="#FFFFFF" fontWeight="500">Submit check-in</text>
       </g>
 
-      {/* Small progress ring badge */}
+      {}
       <g transform="translate(330,60)">
         <circle cx="30" cy="30" r="30" fill="#FFFFFF" stroke="#E9DEE1" strokeWidth="1.5" />
         <circle cx="30" cy="30" r="22" fill="none" stroke="#F4E7EA" strokeWidth="6" />
@@ -30,7 +30,7 @@ export default function HeroIllustration() {
         <text x="30" y="35" textAnchor="middle" fontFamily="Inter, sans-serif" fontSize="12" fontWeight="600" fill="#2E0219">75%</text>
       </g>
 
-      {/* Rising bar chart */}
+      {}
       <g transform="translate(300,220)">
         <rect x="0" y="70" width="24" height="40" rx="3" fill="#F4E7EA" />
         <rect x="34" y="50" width="24" height="60" rx="3" fill="#F4E7EA" />
@@ -38,7 +38,7 @@ export default function HeroIllustration() {
         <rect x="102" y="35" width="24" height="75" rx="3" fill="#8A6270" />
       </g>
 
-      {/* Small avatar dots representing a team */}
+      {}
       <g transform="translate(70,300)">
         <circle cx="0" cy="0" r="14" fill="#450920" />
         <circle cx="24" cy="0" r="14" fill="#8A6270" />

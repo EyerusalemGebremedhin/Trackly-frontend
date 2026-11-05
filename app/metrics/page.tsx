@@ -5,8 +5,7 @@ import {
   BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, Legend,
 } from "recharts";
-import RequireAuth from "@/components/RequireAuth";
-import { api, ApiError } from "@/lib/api";
+import { api } from "@/lib/api";
 import type { Group } from "@/lib/types";
 
 type MyMetrics = {
@@ -65,14 +64,11 @@ function ChartTypePicker({ value, onChange }: { value: ChartType; onChange: (t: 
   );
 }
 
-function MetricsContent() {
+export default function MetricsPage() {
   const [groups, setGroups] = useState<Group[]>([]);
   const [selectedGroup, setSelectedGroup] = useState<number | "me">("me");
   const [myMetrics, setMyMetrics] = useState<MyMetrics | null>(null);
   const [groupMetrics, setGroupMetrics] = useState<GroupMetrics | null>(null);
-  const [groupError, setGroupError] = useState<string | null>(null);
-  const [groupLoading, setGroupLoading] = useState(false);
-  const [reloadKey, setReloadKey] = useState(0);
 
   const [hoursChartType, setHoursChartType] = useState<ChartType>("bar");
   const [trendChartType, setTrendChartType] = useState<ChartType>("line");
@@ -87,21 +83,14 @@ function MetricsContent() {
     if (selectedGroup === "me") {
       api.get<MyMetrics>("/dashboard/metrics/me").then(setMyMetrics);
       setGroupMetrics(null);
-      setGroupError(null);
     } else {
-      setMyMetrics(null);
-      setGroupMetrics(null);
-      setGroupError(null);
-      setGroupLoading(true);
       api
         .get<GroupMetrics>(`/dashboard/metrics/group/${selectedGroup}`)
         .then(setGroupMetrics)
-        .catch((err) =>
-          setGroupError(err instanceof ApiError ? `${err.status}: ${err.message}` : "Couldn't load this group's data.")
-        )
-        .finally(() => setGroupLoading(false));
+        .catch(() => setGroupMetrics(null));
+      setMyMetrics(null);
     }
-  }, [selectedGroup, reloadKey]);
+  }, [selectedGroup]);
 
   const pieData = myMetrics
     ? Object.entries(myMetrics.status_breakdown)
@@ -276,24 +265,11 @@ function MetricsContent() {
         </div>
       )}
 
-      {selectedGroup !== "me" && groupLoading && <p className="text-sm text-muted">Loading…</p>}
-
-      {selectedGroup !== "me" && !groupLoading && groupError && (
-        <div className="bg-danger-bg border-l-4 border-danger rounded-md px-4 py-3 flex items-center justify-between gap-3">
-          <p className="text-sm text-danger">{groupError}</p>
-          <button onClick={() => setReloadKey((k) => k + 1)} className="text-xs text-danger underline shrink-0">
-            Try again
-          </button>
-        </div>
+      {selectedGroup !== "me" && !groupMetrics && (
+        <p className="text-sm text-muted">
+          Only a group's lead can view its metrics. If you lead this group, data will appear here shortly.
+        </p>
       )}
     </div>
-  );
-}
-
-export default function MetricsPage() {
-  return (
-    <RequireAuth>
-      <MetricsContent />
-    </RequireAuth>
   );
 }

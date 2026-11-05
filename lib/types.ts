@@ -2,7 +2,7 @@ export type TaskStatus = "todo" | "in_progress" | "in_review" | "blocked" | "don
 export type Priority = "low" | "medium" | "high";
 export type PeriodType = "daily" | "weekly" | "sprint";
 export type MembershipRole = "lead" | "member";
-export type InsightPeriod = "weekly" | "monthly" | "general";
+export type InsightPeriod = "daily" | "weekly" | "monthly" | "general";
 export type HelpRequestStatus = "open" | "resolved";
 
 export type TaskPeriodType = "daily" | "weekly" | "monthly";

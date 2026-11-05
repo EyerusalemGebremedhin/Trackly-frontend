@@ -1,23 +1,22 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, RotateCcw } from "lucide-react";
-import RequireAuth from "@/components/RequireAuth";
+import { ArrowLeft, Archive, RotateCcw } from "lucide-react";
 import { api, ApiError } from "@/lib/api";
 import type { Group } from "@/lib/types";
 
-function PastGroupsContent() {
+export default function PastGroupsPage() {
   const [groups, setGroups] = useState<Group[] | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const load = useCallback(() => {
-    api.get<Group[]>("/groups/past").then(setGroups);
-  }, []);
+  const load = () => {
+    api.get<Group[]>("/groups/past").then(setGroups).catch(() => setGroups([]));
+  };
 
   useEffect(() => {
     load();
-  }, [load]);
+  }, []);
 
   async function restore(id: number) {
     setError(null);
@@ -25,67 +24,60 @@ function PastGroupsContent() {
       await api.post(`/groups/${id}/unarchive`);
       load();
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : "Couldn't reopen that group.");
+      setError(err instanceof ApiError ? err.message : "Couldn't restore that team.");
     }
   }
 
   return (
     <div>
-      <div className="mb-6">
-        <Link href="/groups" className="flex items-center gap-1.5 text-sm text-muted hover:text-primary mb-3">
-          <ArrowLeft size={14} /> Back to groups
+      <div className="flex items-center gap-4 mb-6">
+        <Link href="/groups" className="p-2 hover:bg-surface rounded-lg">
+          <ArrowLeft size={20} />
         </Link>
-        <h1 className="font-serif text-3xl text-accent">Past groups</h1>
-        <p className="text-sm text-muted mt-1">
-          Groups that have been stopped - finished, with no more work or check-ins happening.
-          Nothing here is ever deleted. A group's lead can reopen it below if that was a mistake.
-        </p>
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold" style={{ fontFamily: 'var(--font-serif)' }}>Past Teams</h1>
+          <p className="text-text-secondary mt-1">Archived teams</p>
+        </div>
       </div>
 
       {error && (
-        <div className="text-sm bg-danger-bg text-danger border-l-4 border-danger px-3 py-2 rounded mb-4">{error}</div>
+        <div className="text-sm bg-red-500/10 text-red-500 border border-red-500/20 px-4 py-3 rounded-lg mb-4">
+          {error}
+        </div>
       )}
 
       {groups === null ? (
-        <p className="text-sm text-muted">Loading…</p>
+        <div className="flex items-center justify-center min-h-[200px]">
+          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+        </div>
       ) : groups.length === 0 ? (
-        <div className="bg-surface border border-hairline rounded-md p-8 text-center shadow-sm">
-          <p className="text-sm text-muted">No stopped groups yet.</p>
+        <div className="bg-surface border border-border rounded-xl p-8 text-center">
+          <Archive size={48} className="mx-auto text-text-secondary mb-4" />
+          <p className="text-text-secondary">No archived teams</p>
         </div>
       ) : (
-        <div className="grid sm:grid-cols-2 gap-4">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {groups.map((g) => (
             <div
               key={g.id}
-              className="bg-surface border border-hairline rounded-md p-4 shadow-sm flex items-start justify-between gap-2"
+              className="bg-surface border border-border rounded-xl p-6"
             >
-              <Link href={`/groups/${g.id}`} className="flex-1 opacity-90 hover:opacity-100">
-                <p className="font-serif text-lg text-accent">{g.name}</p>
-                <p className="text-xs text-muted mt-1 capitalize">{g.checkin_cadence} check-ins · Stopped</p>
-              </Link>
-              {g.my_role === "lead" ? (
-                <button
-                  onClick={() => restore(g.id)}
-                  title="Reopen this group"
-                  className="shrink-0 flex items-center gap-1.5 text-xs text-primary border border-primary rounded-md px-2.5 py-1.5 hover:bg-blush"
-                >
-                  <RotateCcw size={13} /> Reopen
-                </button>
-              ) : (
-                <span className="shrink-0 text-xs text-muted px-2.5 py-1.5">Only the lead can reopen</span>
-              )}
+              <div className="flex items-center gap-3 mb-3">
+                <Archive size={20} className="text-text-secondary" />
+                <h3 className="text-lg font-semibold">{g.name}</h3>
+              </div>
+              <p className="text-sm text-text-secondary capitalize mb-4">{g.checkin_cadence} check-ins</p>
+              <button
+                onClick={() => restore(g.id)}
+                className="flex items-center gap-2 text-sm text-primary hover:underline"
+              >
+                <RotateCcw size={14} />
+                Restore team
+              </button>
             </div>
           ))}
         </div>
       )}
     </div>
-  );
-}
-
-export default function PastGroupsPage() {
-  return (
-    <RequireAuth>
-      <PastGroupsContent />
-    </RequireAuth>
   );
 }

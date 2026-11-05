@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { useRouter } from "next/navigation";
-import { api, setToken, clearToken } from "./api";
+import { api, setToken, clearToken, ApiError } from "./api";
 
 export type User = {
   id: number;
@@ -49,15 +49,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const form = new URLSearchParams();
     form.set("username", email);
     form.set("password", password);
-    const res = await api.postForm<{ access_token: string }>("/auth/login", form);
-    setToken(res.access_token);
-    await refreshUser();
-    router.push("/dashboard");
+    try {
+      const res = await api.postForm<{ access_token: string }>("/auth/login", form);
+      setToken(res.access_token);
+      await refreshUser();
+      router.push("/dashboard");
+      return;
+    } catch (err: any) {
+      const msg = err?.message || "";
+      if (msg.includes("MFA") || msg.includes("Verification code")) {
+        router.push(`/verify-email?email=${encodeURIComponent(email)}`);
+        throw err;
+      }
+      router.push(`/verify-email?email=${encodeURIComponent(email)}`);
+      throw err;
+    }
   }
 
   async function register(name: string, email: string, password: string) {
     await api.post("/auth/register", { name, email, password });
-    await login(email, password);
+    router.push(`/verify-email?email=${encodeURIComponent(email)}`);
   }
 
   function logout() {

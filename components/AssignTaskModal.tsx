@@ -7,14 +7,16 @@ import type { GroupMember, Priority } from "@/lib/types";
 
 export default function AssignTaskModal({
   groupId,
-  members,
+  members = [],
   onClose,
   onDone,
+  open = true,
 }: {
   groupId: number;
-  members: GroupMember[];
+  members?: GroupMember[];
   onClose: () => void;
   onDone: () => void;
+  open?: boolean;
 }) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -25,6 +27,8 @@ export default function AssignTaskModal({
   const [isManagementDuty, setIsManagementDuty] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+
+  if (!open) return null;
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -80,7 +84,7 @@ export default function AssignTaskModal({
             className="w-full border border-hairline rounded-md px-3 py-2 text-sm bg-paper text-ink focus:outline-none focus:ring-2 focus:ring-primary"
           >
             <option value="">Choose a member…</option>
-            {members.map((m) => (
+            {(members || []).map((m) => (
               <option key={m.user_id} value={m.user_id}>
                 {m.name}
               </option>
@@ -104,7 +108,7 @@ export default function AssignTaskModal({
             <label className="text-xs text-muted block mb-1">Estimated hours</label>
             <input
               type="number"
-              min={0}
+              min={0.5}
               step={0.5}
               value={estimatedHours}
               onChange={(e) => setEstimatedHours(Number(e.target.value))}
@@ -121,18 +125,23 @@ export default function AssignTaskModal({
             className="w-full border border-hairline rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
           />
         </div>
-        <label className="flex items-center gap-2 text-sm text-ink">
-          <input type="checkbox" checked={isManagementDuty} onChange={(e) => setIsManagementDuty(e.target.checked)} />
-          This is a lead management duty, not delegated work
+        <label className="flex items-center gap-2 text-sm">
+          <input
+            type="checkbox"
+            checked={isManagementDuty}
+            onChange={(e) => setIsManagementDuty(e.target.checked)}
+          />
+          Management duty
         </label>
         {error && <p className="text-xs text-danger">{error}</p>}
-        <button
-          type="submit"
-          disabled={submitting}
-          className="w-full bg-primary hover:bg-primary-hover text-white rounded-md px-4 py-2 text-sm font-medium disabled:opacity-60"
-        >
-          {submitting ? "Assigning…" : "Assign task"}
-        </button>
+        <div className="flex justify-end gap-2 pt-2">
+          <button type="button" onClick={onClose} className="px-3 py-1.5 text-sm border border-hairline rounded-md">
+            Cancel
+          </button>
+          <button disabled={submitting} className="px-3 py-1.5 text-sm bg-primary text-white rounded-md disabled:opacity-60">
+            {submitting ? "Assigning..." : "Assign"}
+          </button>
+        </div>
       </form>
     </Modal>
   );
