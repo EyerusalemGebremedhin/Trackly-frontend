@@ -1,14 +1,13 @@
 "use client";
 
-export const dynamic = "force-dynamic";
-
+import { Suspense } from "react";
 import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { CheckCircle, XCircle } from "lucide-react";
 import { api, ApiError } from "@/lib/api";
 import AuthLayout from "@/components/AuthLayout";
 
-export default function ActivatePage() {
+function ActivateContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const token = searchParams.get("token");
@@ -68,5 +67,13 @@ export default function ActivatePage() {
         )}
       </div>
     </AuthLayout>
+  );
+}
+
+export default function ActivatePage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ActivateContent />
+    </Suspense>
   );
 }
