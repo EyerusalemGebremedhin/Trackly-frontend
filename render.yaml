@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: trackly-frontend
+    env: node
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NEXT_PUBLIC_API_URL
+        sync: false
