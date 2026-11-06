@@ -93,10 +93,16 @@ export default function LandingPage() {
           <div className="flex flex-col items-center justify-between gap-3 md:flex-row">
             <span className="font-serif text-accent">Trackly</span>
             <span className="text-xs text-muted">© 2026 All rights reserved. Developed by Eyerusalem Gebremedhin</span>
-            <span className="flex gap-4 text-xs">
-              <a href="mailto:trackly15@gmail.com" className="text-blue-600 hover:underline">Email</a>
-              <a href="https://www.linkedin.com/in/eyerusalem-gebremedhin-793a493b4" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">LinkedIn</a>
-              <a href="https://github.com/EyerusalemGebremedhin" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">GitHub</a>
+            <span className="flex gap-4 text-xs items-center">
+              <a href="mailto:trackly15@gmail.com" className="hover:opacity-80">
+                <img src="/Email.png" alt="Email" className="h-5 w-5 object-contain" />
+              </a>
+              <a href="https://www.linkedin.com/in/eyerusalem-gebremedhin-793a493b4" target="_blank" rel="noopener noreferrer" className="hover:opacity-80">
+                <img src="/Ln.png" alt="LinkedIn" className="h-5 w-5 object-contain" />
+              </a>
+              <a href="https://github.com/EyerusalemGebremedhin" target="_blank" rel="noopener noreferrer" className="hover:opacity-80">
+                <img src="/github.jpeg" alt="GitHub" className="h-5 w-5 object-contain" />
+              </a>
             </span>
           </div>
         </div>
