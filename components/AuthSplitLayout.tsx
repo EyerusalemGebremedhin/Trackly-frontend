@@ -100,10 +100,10 @@ export default function AuthSplitLayout({ children, variant, title, subtitle }: 
         </button>
         <div className="w-full max-w-xl">
           <div className="mb-6 lg:mb-8 text-center">
-            <div className="flex items-center justify-center gap-3 mb-6 lg:mb-8 lg:hidden">
-              <Link href="/" className="flex items-center gap-3">
-                <Logo size={40} />
-                <span className="text-2xl font-semibold tracking-tight" style={{ fontFamily: 'var(--font-serif)' }}>Trackly</span>
+            <div className="absolute top-4 left-4 flex items-center gap-2 lg:hidden">
+              <Link href="/" className="flex items-center gap-2">
+                <Logo size={32} />
+                <span className="text-xl font-semibold tracking-tight" style={{ fontFamily: 'var(--font-serif)' }}>Trackly</span>
               </Link>
             </div>
             <div className="space-y-2 lg:space-y-3">
