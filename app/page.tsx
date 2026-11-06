@@ -34,7 +34,7 @@ export default function LandingPage() {
             <Logo size={32} reversed />
             Trackly
           </span>
-          <nav className="flex items-center gap-3">
+          <nav className="hidden sm:flex items-center gap-3">
             <div className="rounded-full bg-surface p-1 shadow">
               <ThemeToggle />
             </div>
@@ -51,6 +51,11 @@ export default function LandingPage() {
               Get started free
             </Link>
           </nav>
+          <div className="flex sm:hidden items-center gap-2">
+            <div className="rounded-full bg-surface p-1 shadow">
+              <ThemeToggle />
+            </div>
+          </div>
         </header>
       </div>
 
@@ -67,6 +72,11 @@ export default function LandingPage() {
         <p className="mt-6 text-xs text-muted">
           Daily, weekly or monthly check-ins · Personal plans and team boards · Fair AI feedback
         </p>
+
+        <div className="mt-8 flex sm:hidden flex-col gap-3">
+          <Link href="/signup" className="rounded-md bg-primary px-4 py-2.5 text-sm font-medium text-white text-center">Get started free</Link>
+          <Link href="/login" className="rounded-md border border-white/40 px-4 py-2.5 text-sm text-white text-center">Log in</Link>
+        </div>
       </section>
 
       {}
