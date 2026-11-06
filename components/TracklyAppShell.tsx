@@ -7,6 +7,7 @@ import { useAuth } from "@/lib/auth-context";
 import { Bell, MessageCircle } from "lucide-react";
 import ThemeToggle from "./ThemeToggle";
 import Link from "next/link";
+import Logo from "./Logo";
 import { api } from "@/lib/api";
 import type { Quote } from "@/lib/types";
 import ChatWidget from "./ChatWidget";
@@ -38,7 +39,11 @@ export default function TracklyAppShell({ children }: { children: ReactNode }) {
       <div className="lg:pl-72">
         <header className="sticky top-0 z-40 bg-background/95 backdrop-blur-lg border-b border-border">
           <div className="flex items-center justify-between px-4 sm:px-6 lg:px-8 py-4 gap-4">
-            <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2 min-w-0 flex-1">
+             <Link href="/dashboard" className="lg:hidden shrink-0">
+               <Logo size={32} />
+             </Link>
+             <div className="min-w-0">
               <h2 className="text-lg sm:text-xl font-semibold truncate" style={{ fontFamily: 'var(--font-serif)' }}>Welcome back, {user?.name?.split(' ')[0]}</h2>
                {quote ? (
                  <p className="text-xs text-muted line-clamp-2">
@@ -47,6 +52,7 @@ export default function TracklyAppShell({ children }: { children: ReactNode }) {
                ) : (
                 <p className="text-sm text-text-secondary">Talk to Trackly • Manage your goals</p>
               )}
+            </div>
             </div>
             <div className="flex items-center gap-2 shrink-0">
               <Link
