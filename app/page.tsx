@@ -60,8 +60,8 @@ export default function LandingPage() {
       </div>
 
       <div className="sm:hidden px-6 py-4 flex flex-col gap-3">
-        <Link href="/signup" className="rounded-md bg-primary px-4 py-2.5 text-sm font-medium text-white text-center w-full">Sign up</Link>
-        <Link href="/login" className="rounded-md bg-white px-4 py-2.5 text-sm font-medium text-primary text-center w-full">Login</Link>
+        <Link href="/signup" className="rounded-md bg-primary px-4 py-2.5 text-sm font-medium text-white text-center w-full shadow-lg">Sign up</Link>
+        <Link href="/login" className="rounded-md bg-white px-4 py-2.5 text-sm font-medium text-primary text-center w-full shadow-lg">Login</Link>
       </div>
 
       <section className="mx-auto max-w-3xl px-6 py-14 text-center md:py-16">
