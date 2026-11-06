@@ -64,7 +64,7 @@ export default function LandingPage() {
         <Link href="/login" className="rounded-md bg-white px-4 py-2.5 text-sm font-medium text-primary text-center flex-1 shadow-lg">Login</Link>
       </div>
 
-      <section className="mx-auto max-w-3xl px-6 py-14 text-center md:py-16">
+      <section className="mx-auto max-w-3xl px-6 py-6 md:py-14 text-center md:py-16">
         <h1 className="font-serif text-5xl leading-tight text-ink md:text-6xl">
           Progress, <span className="text-primary">tracked honestly.</span>
         </h1>
