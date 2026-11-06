@@ -7,6 +7,7 @@ import { useAuth } from "@/lib/auth-context";
 import clsx from "clsx";
 import { useState } from "react";
 import { mediaUrl } from "@/lib/media";
+import { Logo } from "@/components/Logo";
 
 const NAV = [
   { href: "/dashboard", label: "Home", icon: Home },
