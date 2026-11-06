@@ -65,8 +65,9 @@ export default function LandingPage() {
       </div>
 
       <section className="mx-auto max-w-3xl px-6 -mt-4 md:py-14 text-center md:py-16">
-        <h1 className="font-serif text-5xl leading-tight text-ink md:text-6xl">
-          Progress, <span className="text-primary">tracked honestly.</span>
+        <h1 className="font-serif text-3xl md:text-5xl leading-tight text-ink md:text-6xl">
+          Progress <span className="text-primary">tracked honestly</span>
+        </h1>
         </h1>
         <p className="mx-auto mt-6 max-w-xl text-lg text-muted">
           Whether it&apos;s just you, or a team you lead, check in on what you actually did,
