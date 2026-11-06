@@ -123,9 +123,9 @@ export default function SignupPage() {
           />
           <span className="text-muted">
             I agree to the{" "}
-            <Link href="/terms" className="text-primary hover:underline">Terms of Service</Link>{" "}
+            <Link href="/terms" className="text-primary hover:underline font-bold">Terms of Service</Link>{" "}
             and{" "}
-            <Link href="/privacy" className="text-primary hover:underline">Privacy Policy</Link>
+            <Link href="/privacy" className="text-primary hover:underline font-bold">Privacy Policy</Link>
           </span>
         </label>
 
