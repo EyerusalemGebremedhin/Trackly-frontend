@@ -6,7 +6,7 @@ import { Home, Users, CheckSquare, MessageCircle, UserRound, LogOut, BarChart3, 
 import { useAuth } from "@/lib/auth-context";
 import clsx from "clsx";
 import { useState } from "react";
-import Logo from "./Logo";
+import { mediaUrl } from "@/lib/media";
 
 const NAV = [
   { href: "/dashboard", label: "Home", icon: Home },
@@ -84,7 +84,7 @@ export default function TracklySidebar() {
         >
           <div className="w-10 h-10 rounded-full bg-white/20 text-white flex items-center justify-center text-sm font-semibold shadow-lg overflow-hidden">
             {(user as any)?.avatar_url ? (
-              <img src={(user as any).avatar_url?.startsWith('http') ? (user as any).avatar_url : (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000') + (user as any).avatar_url} alt="" className="w-full h-full object-cover" />
+              <img src={mediaUrl((user as any).avatar_url) || ""} alt="" className="w-full h-full object-cover" />
             ) : (
               <span>{user?.name?.[0]?.toUpperCase() ?? "U"}</span>
             )}
