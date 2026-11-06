@@ -41,7 +41,7 @@ function VerifyEmailForm() {
         setTokens(res.access_token, res.refresh_token);
         window.location.href = "/dashboard";
       } else if (res?.token) {
-        setToken(res.token);
+        setTokens(res.token);
         window.location.href = "/dashboard";
       } else {
         window.location.href = "/login?verified=1";
