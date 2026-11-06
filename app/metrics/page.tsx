@@ -23,6 +23,9 @@ type GroupMemberMetric = {
   on_time_rate: number;
   estimated_hours: number;
   actual_hours: number;
+  checkins_daily: number;
+  checkins_weekly: number;
+  checkins_monthly: number;
 };
 
 type GroupMetrics = { members: GroupMemberMetric[] };
@@ -261,6 +264,24 @@ export default function MetricsPage() {
                 ))}
               </LineChart>
             )}
+          </ResponsiveContainer>
+        </div>
+      )}
+
+      {selectedGroup !== "me" && groupMetrics && (
+        <div className="bg-surface border border-hairline rounded-md p-4 shadow-sm mt-6">
+          <h2 className="font-serif text-lg text-accent mb-3">Check-ins by member</h2>
+          <ResponsiveContainer width="100%" height={260}>
+            <BarChart data={groupMetrics.members}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#E9DEE1" />
+              <XAxis dataKey="name" tick={{ fontSize: 12 }} />
+              <YAxis tick={{ fontSize: 12 }} allowDecimals={false} />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="checkins_daily" name="Daily" fill="#450920" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="checkins_weekly" name="Weekly" fill="#8A6270" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="checkins_monthly" name="Monthly" fill="#2E0219" radius={[4, 4, 0, 0]} />
+            </BarChart>
           </ResponsiveContainer>
         </div>
       )}

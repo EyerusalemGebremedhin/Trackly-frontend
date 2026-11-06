@@ -293,7 +293,7 @@ export default function GroupPage() {
             )}
           </div>
 
-          {isLead && dash && dash.members && dash.members.length > 0 && (
+          {false && isLead && dash && dash.members && dash.members.length > 0 && (
             <div className="bg-surface border border-border rounded-xl p-4">
               <h2 className="font-medium mb-3">Member Activity</h2>
               <div className="space-y-2">
