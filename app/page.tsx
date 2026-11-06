@@ -105,10 +105,19 @@ export default function LandingPage() {
               <span className="font-serif text-accent">Trackly</span>
             </div>
             <span className="text-xs text-muted text-center">© 2026 All rights reserved. Developed by Eyerusalem Gebremedhin</span>
-            <div className="flex items-center gap-4">
-              <a href="mailto:trackly15@gmail.com" className="hover:opacity-80"><img src="/Email.png" alt="Email" className="h-5 w-5 object-contain" /></a>
-              <a href="https://www.linkedin.com/in/eyerusalem-gebremedhin-793a493b4" target="_blank" rel="noopener noreferrer" className="hover:opacity-80"><img src="/Ln.png" alt="LinkedIn" className="h-5 w-5 object-contain" /></a>
-              <a href="https://github.com/EyerusalemGebremedhin" target="_blank" rel="noopener noreferrer" className="hover:opacity-80"><img src="/github.jpeg" alt="GitHub" className="h-5 w-5 object-contain" /></a>
+            <div className="flex items-center gap-6">
+              <a href="mailto:trackly15@gmail.com" className="hover:opacity-80 flex flex-col items-center gap-1">
+                <img src="/Email.png" alt="Email" className="h-5 w-5 object-contain" />
+                <span className="text-blue-600 text-xs">Email</span>
+              </a>
+              <a href="https://www.linkedin.com/in/eyerusalem-gebremedhin-793a493b4" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 flex flex-col items-center gap-1">
+                <img src="/Ln.png" alt="LinkedIn" className="h-5 w-5 object-contain" />
+                <span className="text-blue-600 text-xs">LinkedIn</span>
+              </a>
+              <a href="https://github.com/EyerusalemGebremedhin" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 flex flex-col items-center gap-1">
+                <img src="/github.jpeg" alt="GitHub" className="h-5 w-5 object-contain" />
+                <span className="text-blue-600 text-xs">GitHub</span>
+              </a>
             </div>
           </div>
         </div>
