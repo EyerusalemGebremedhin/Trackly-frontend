@@ -68,7 +68,6 @@ export default function LandingPage() {
         <h1 className="font-serif text-3xl md:text-5xl leading-tight text-ink md:text-6xl">
           Progress <span className="text-primary">tracked honestly</span>
         </h1>
-        </h1>
         <p className="mx-auto mt-6 max-w-xl text-lg text-muted">
           Whether it&apos;s just you, or a team you lead, check in on what you actually did,
           what&apos;s blocking you, and let the honest record speak for itself.
