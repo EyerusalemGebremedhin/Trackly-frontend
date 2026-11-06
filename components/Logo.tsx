@@ -5,7 +5,7 @@ export default function Logo({ size = 32, reversed = false }: { size?: number; r
       <path
         d="M9 16.5l4.5 4.5L23 11.5"
         fill="none"
-        stroke={reversed ? "#3C050F" : "var(--color-paper)"}
+        stroke={reversed ? "#3C050F" : "#FFFFFF"}
         strokeWidth="3"
         strokeLinecap="round"
         strokeLinejoin="round"
