@@ -40,7 +40,7 @@ export default function LandingPage() {
             </div>
             <Link
               href="/login"
-              className="hidden rounded-md px-3 py-2 text-sm text-white hover:bg-white/10 sm:block"
+              className="rounded-md px-3 py-2 text-sm text-white hover:bg-white/10"
             >
               Log in
             </Link>
