@@ -59,8 +59,10 @@ export default function LandingPage() {
         </header>
       </div>
 
-      {}
-      <section className="mx-auto max-w-3xl px-6 py-14 text-center md:py-16">
+      <div className="sm:hidden px-6 py-4 flex flex-col gap-3">
+        <Link href="/signup" className="rounded-md bg-primary px-4 py-2.5 text-sm font-medium text-white text-center w-full">Sign up</Link>
+        <Link href="/login" className="rounded-md bg-white px-4 py-2.5 text-sm font-medium text-primary text-center w-full">Login</Link>
+      </div>
         <h1 className="font-serif text-5xl leading-tight text-ink md:text-6xl">
           Progress, <span className="text-primary">tracked honestly.</span>
         </h1>
@@ -72,11 +74,6 @@ export default function LandingPage() {
         <p className="mt-6 text-xs text-muted">
           Daily, weekly or monthly check-ins · Personal plans and team boards · Fair AI feedback
         </p>
-
-        <div className="mt-8 flex sm:hidden flex-col gap-3">
-          <Link href="/signup" className="rounded-md bg-primary px-4 py-2.5 text-sm font-medium text-white text-center">Get started free</Link>
-          <Link href="/login" className="rounded-md border border-white/40 px-4 py-2.5 text-sm text-white text-center">Log in</Link>
-        </div>
       </section>
 
       {}
