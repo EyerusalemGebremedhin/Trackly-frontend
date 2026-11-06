@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { useRouter } from "next/navigation";
-import { api, setToken, clearToken, ApiError } from "./api";
+import { api, setTokens, clearToken, ApiError } from "./api";
 
 export type User = {
   id: number;
@@ -50,8 +50,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     form.set("username", email);
     form.set("password", password);
     try {
-      const res = await api.postForm<{ access_token: string }>("/auth/login", form);
-      setToken(res.access_token);
+      const res = await api.postForm<{ access_token: string; refresh_token?: string }>("/auth/login", form);
+      setTokens(res.access_token, res.refresh_token);
       await refreshUser();
       router.push("/dashboard");
       return;

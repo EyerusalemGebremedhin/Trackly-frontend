@@ -53,10 +53,14 @@ export const api = {
     request<T>(path, { method: "POST", body: form }),
 };
 
-export function setToken(token: string) {
-  localStorage.setItem("ember_token", token);
+export function setTokens(access: string, refresh?: string) {
+  localStorage.setItem("ember_token", access);
+  if (refresh) localStorage.setItem("ember_refresh", refresh);
 }
-
+export function setToken(token: string) { localStorage.setItem("ember_token", token); }
+export function getRefreshToken() { return typeof window === "undefined" ? null : localStorage.getItem("ember_refresh"); }
+export function setRefreshToken(token: string) { localStorage.setItem("ember_refresh", token); }
 export function clearToken() {
   localStorage.removeItem("ember_token");
+  localStorage.removeItem("ember_refresh");
 }

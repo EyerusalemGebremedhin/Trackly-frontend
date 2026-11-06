@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense, useRef } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { CheckCircle, ShieldCheck } from "lucide-react";
-import { api, ApiError, setToken } from "@/lib/api";
+import { api, ApiError, setTokens } from "@/lib/api";
 import AuthSplitLayout from "@/components/AuthSplitLayout";
 
 function VerifyEmailForm() {
@@ -38,7 +38,7 @@ function VerifyEmailForm() {
       console.log("verify-email response:", res);
       setSuccess(true);
       if (res?.access_token) {
-        setToken(res.access_token);
+        setTokens(res.access_token, res.refresh_token);
         window.location.href = "/dashboard";
       } else if (res?.token) {
         setToken(res.token);
