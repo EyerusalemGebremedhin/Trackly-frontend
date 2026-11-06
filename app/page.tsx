@@ -96,15 +96,15 @@ export default function LandingPage() {
             <span className="flex gap-4 text-xs items-center">
               <a href="mailto:trackly15@gmail.com" className="hover:opacity-80 flex flex-col items-center gap-1">
                 <img src="/Email.png" alt="Email" className="h-5 w-5 object-contain" />
-                <span>trackly15@gmail.com</span>
+                <span className="text-blue-600 break-all">trackly15@gmail.com</span>
               </a>
               <a href="https://www.linkedin.com/in/eyerusalem-gebremedhin-793a493b4" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 flex flex-col items-center gap-1">
                 <img src="/Ln.png" alt="LinkedIn" className="h-5 w-5 object-contain" />
-                <span>linkedin.com/in/eyerusalem-gebremedhin-793a493b4</span>
+                <span className="text-blue-600 break-all">linkedin.com/in/eyerusalem-gebremedhin-793a493b4</span>
               </a>
               <a href="https://github.com/EyerusalemGebremedhin" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 flex flex-col items-center gap-1">
                 <img src="/github.jpeg" alt="GitHub" className="h-5 w-5 object-contain" />
-                <span>github.com/EyerusalemGebremedhin</span>
+                <span className="text-blue-600 break-all">github.com/EyerusalemGebremedhin</span>
               </a>
             </span>
           </div>
