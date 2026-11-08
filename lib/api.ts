@@ -30,7 +30,11 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
     try {
       const body = await res.json();
       if (Array.isArray(body.detail)) {
-        detail = body.detail.map((d: any) => d.msg || d.message).join(", ");
+        detail = body.detail.map((d: any) => {
+          const msg = d.msg || d.message || "Invalid input";
+          if (msg.toLowerCase().includes("email")) return "Please enter a valid email address.";
+          return msg;
+        }).join(", ");
       } else {
         detail = typeof body.detail === "string" ? body.detail : JSON.stringify(body.detail);
       }
