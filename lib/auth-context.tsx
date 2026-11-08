@@ -57,11 +57,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return;
     } catch (err: any) {
       const msg = err?.message || "";
-      if (msg.includes("MFA") || msg.includes("Verification code")) {
+      if (msg.includes("MFA") || msg.includes("Verification code") || msg.includes("mfa required")) {
         router.push(`/verify-email?email=${encodeURIComponent(email)}`);
         throw err;
       }
-      router.push(`/verify-email?email=${encodeURIComponent(email)}`);
       throw err;
     }
   }

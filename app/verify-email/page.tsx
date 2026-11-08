@@ -23,9 +23,10 @@ function VerifyEmailForm() {
     if (emailParam) setEmail(emailParam.replace(/ /g, "+"));
     if (codeParam && codeParam.length === 6 && emailParam && !autoTried.current) {
       autoTried.current = true;
+      const cleanEmail = emailParam.replace(/ /g, "+");
       setCode(codeParam.split(""));
       setTimeout(() => {
-        verifyCode(emailParam, codeParam);
+        verifyCode(cleanEmail, codeParam);
       }, 500);
     }
   }, [searchParams]);
@@ -138,7 +139,14 @@ function VerifyEmailForm() {
 
         <div>
           <p className="text-sm font-medium mb-3 text-center">Enter the 6 digit code</p>
-          <div className="flex gap-2 justify-between">
+          <div className="flex gap-2 justify-between" onPaste={(e) => {
+        const pasted = e.clipboardData.getData("text").replace(/\D/g, "");
+        if (pasted.length >= 6) {
+          e.preventDefault();
+          const digits = pasted.slice(0, 6).split("");
+          if (typeof setCode === "function") setCode(digits.concat(Array(6 - digits.length).fill("")));
+        }
+      }}>
             {code.map((digit, index) => (
               <input
                 key={index}

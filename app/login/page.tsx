@@ -98,9 +98,9 @@ export default function LoginPage() {
 
       <div className="mt-6 text-center text-sm text-muted">
         Don&apos;t have an account?{" "}
-        <Link href="/signup" className="text-primary hover:underline font-medium">
-          Sign up
-        </Link>
+        <Link href="/signup" className="text-primary hover:underline font-medium">Sign up</Link>
+        <span className="mx-2">|</span>
+        <Link href="/activate" className="text-primary hover:underline font-medium">Activate account</Link>
       </div>
     </AuthSplitLayout>
   );

@@ -327,31 +327,25 @@ export default function GroupPage() {
               <button onClick={() => setInviteOpen(false)} className="text-muted hover:text-ink"><X size={18} /></button>
             </div>
             <form onSubmit={sendInvite} className="space-y-3">
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="text-xs text-muted block mb-1">First Name *</label>
-                  <input required value={inviteForm.firstName} onChange={(e) => setInviteForm({...inviteForm, firstName: e.target.value})} className="w-full border border-hairline rounded-md px-3 py-2 text-sm" />
-                </div>
+              <div>
+                <label className="text-xs text-muted block mb-1">First Name *</label>
+                <input required value={inviteForm.firstName} onChange={(e) => setInviteForm({...inviteForm, firstName: e.target.value})} className="w-full border border-hairline rounded-md px-3 py-2 text-sm" />
+              </div>
+              <div>
+                <label className="text-xs text-muted block mb-1">Last Name</label>
+                <input value={inviteForm.lastName} onChange={(e) => setInviteForm({...inviteForm, lastName: e.target.value})} className="w-full border border-hairline rounded-md px-3 py-2 text-sm" />
+              </div>
               <div>
                 <label className="text-xs text-muted block mb-1">Email Address *</label>
                 <input type="email" required value={inviteForm.email} onChange={(e) => setInviteForm({...inviteForm, email: e.target.value})} className="w-full border border-hairline rounded-md px-3 py-2 text-sm" />
               </div>
               <div>
                 <label className="text-xs text-muted block mb-1">Role (free text)</label>
-                <input value={(inviteForm as any).role || ""} onChange={(e) => setInviteForm({...inviteForm, role: e.target.value} as any)} className="w-full border border-hairline rounded-md px-3 py-2 text-sm" placeholder="e.g. Developer, Designer" />
+                <input value={inviteForm.role || ""} onChange={(e) => setInviteForm({...inviteForm, role: e.target.value})} className="w-full border border-hairline rounded-md px-3 py-2 text-sm" placeholder="e.g. Developer, Designer" />
               </div>
               <div>
                 <label className="text-xs text-muted block mb-1">Reason for adding (visible to group)</label>
-                <input value={(inviteForm as any).reason || ""} onChange={(e) => setInviteForm({...inviteForm, reason: e.target.value} as any)} className="w-full border border-hairline rounded-md px-3 py-2 text-sm" placeholder="Why this member is being added" />
-              </div>
-              </div>
-              <div>
-                <label className="text-xs text-muted block mb-1">Role (free text)</label>
-                <input value={(inviteForm as any).role || ""} onChange={(e) => setInviteForm({...inviteForm, role: e.target.value} as any)} className="w-full border border-hairline rounded-md px-3 py-2 text-sm" placeholder="e.g. Developer, Designer" />
-              </div>
-              <div>
-                <label className="text-xs text-muted block mb-1">Reason for adding (visible to group)</label>
-                <input value={(inviteForm as any).inviteReason || ""} onChange={(e) => setInviteForm({...inviteForm, inviteReason: e.target.value} as any)} className="w-full border border-hairline rounded-md px-3 py-2 text-sm" placeholder="Why this member is being added" />
+                <input value={inviteForm.inviteReason || ""} onChange={(e) => setInviteForm({...inviteForm, inviteReason: e.target.value})} className="w-full border border-hairline rounded-md px-3 py-2 text-sm" placeholder="Why this member is being added" />
               </div>
               {inviteMsg && <p className={`text-xs ${inviteMsg.includes('sent') ? 'text-success' : 'text-danger'}`}>{inviteMsg}</p>}
               <div className="flex justify-end gap-2 pt-2">
