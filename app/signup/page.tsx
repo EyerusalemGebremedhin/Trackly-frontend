@@ -33,7 +33,7 @@ export default function SignupPage() {
     setLoading(true);
     try {
       const name = `${form.firstName} ${form.lastName}`.trim();
-      await api.post("/auth/register", { name, email: form.email, password: form.password, skills: [] });
+      await api.post("/auth/register", { name, email: form.email, password: form.password, skills: "" });
       router.push(`/verify-email?email=${encodeURIComponent(form.email)}`);
     } catch (err: any) {
       setError(err?.message || "Signup failed");
