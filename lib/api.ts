@@ -29,7 +29,11 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
     let detail = res.statusText;
     try {
       const body = await res.json();
-      detail = typeof body.detail === "string" ? body.detail : JSON.stringify(body.detail);
+      if (Array.isArray(body.detail)) {
+        detail = body.detail.map((d: any) => d.msg || d.message).join(", ");
+      } else {
+        detail = typeof body.detail === "string" ? body.detail : JSON.stringify(body.detail);
+      }
     } catch {
     }
     throw new ApiError(res.status, detail);
