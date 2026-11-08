@@ -20,7 +20,7 @@ function VerifyEmailForm() {
   useEffect(() => {
     const emailParam = searchParams.get("email");
     const codeParam = searchParams.get("code");
-    if (emailParam) setEmail(emailParam);
+    if (emailParam) setEmail(emailParam.replace(/ /g, "+"));
     if (codeParam && codeParam.length === 6 && emailParam && !autoTried.current) {
       autoTried.current = true;
       setCode(codeParam.split(""));
