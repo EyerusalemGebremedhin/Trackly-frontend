@@ -67,9 +67,13 @@ export default function GroupMessages({ groupId }: { groupId: number | string })
   }, [load]);
 
   useEffect(() => {
-    function onDocClick() { setOpenMenu(null); }
-    document.addEventListener("mousedown", onDocClick);
-    return () => document.removeEventListener("mousedown", onDocClick);
+    function onDocDown(e: MouseEvent) {
+      const t = e.target as HTMLElement | null;
+      if (t?.closest?.("[data-msg-menu]")) return;
+      setOpenMenu(null);
+    }
+    document.addEventListener("mousedown", onDocDown);
+    return () => document.removeEventListener("mousedown", onDocDown);
   }, []);
 
   useEffect(() => {
@@ -209,13 +213,13 @@ export default function GroupMessages({ groupId }: { groupId: number | string })
                         {m.pinned && <span className="text-xs text-primary ml-2">📌</span>}
                       </p>
                       {mine && (
-                        <div className="relative ml-auto">
-                          <button type="button" className="p-1 rounded hover:bg-background text-primary" onClick={(e) => { e.stopPropagation(); setOpenMenu(openMenu === m.id ? null : m.id); }} aria-label="More actions">
+                        <div className="relative ml-auto" data-msg-menu>
+                          <button type="button" className="p-1 rounded hover:bg-background text-primary" onMouseDown={(e) => e.stopPropagation()} onClick={(e) => { e.stopPropagation(); setOpenMenu(openMenu === m.id ? null : m.id); }} aria-label="More actions">
                             <MoreVertical size={16} />
                           </button>
                           {openMenu === m.id && (
-                            <div className="absolute right-0 mt-1 bg-surface border border-border rounded-lg shadow-md z-10 w-44" onClick={(e) => e.stopPropagation()}>
-                              <button type="button" className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-background" onClick={() => { navigator.clipboard?.writeText(m.body); setOpenMenu(null); }}>
+                            <div className="absolute right-0 mt-1 bg-surface border border-border rounded-lg shadow-md z-20 w-48" data-msg-menu onMouseDown={(e) => e.stopPropagation()} onClick={(e) => e.stopPropagation()}>
+                              <button type="button" className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-background" onClick={async () => { try { await navigator.clipboard?.writeText(m.body); } catch {} setOpenMenu(null); }}>
                                 <Copy size={14} /> Copy
                               </button>
                               <button type="button" className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-background" onClick={async () => {
@@ -238,11 +242,11 @@ export default function GroupMessages({ groupId }: { groupId: number | string })
                               }}>
                                 <Pencil size={14} /> Edit
                               </button>
-                              <button type="button" className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-background" onClick={() => deleteForMe(m)}>
+                              <button type="button" className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-background" onClick={() => void deleteForMe(m)}>
                                 <Trash2 size={14} /> Delete
                               </button>
                               {canDeleteEveryone(m) && (
-                                <button type="button" className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-500 hover:bg-background" onClick={() => deleteForEveryone(m)}>
+                                <button type="button" className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-500 hover:bg-background" onClick={() => void deleteForEveryone(m)}>
                                   <Trash2 size={14} /> Delete for everyone
                                 </button>
                               )}
