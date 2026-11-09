@@ -245,7 +245,7 @@ async function send() {
             <div className="min-w-0">
               <p className="truncate text-sm font-bold">{isSelf ? "Saved (You)" : displayName(other)}</p>
               <p className="text-xs text-muted">
-                {isSelf ? "Notes and links for yourself" : other.is_active ? "Active" : "Away"}
+                {isSelf ? "Notes and links for yourself" : other.is_online ? "Active now" : "Offline"}
               </p>
             </div>
           </Link>

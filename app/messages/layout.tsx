@@ -117,7 +117,7 @@ export default function MessagesLayout({ children }: { children: React.ReactNode
                             <Avatar src={(c.other || c.user)?.avatar_url} name={name} size={40} />
                             <span
                               className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-white ${
-                                (c.other || c.user)?.is_active ? "bg-green-500" : "bg-gray-400"
+                                (c.other || c.user)?.is_online ? "bg-green-500" : "bg-gray-400"
                               }`}
                             />
                           </>
