@@ -58,12 +58,12 @@ export default function ViewProfilePage() {
           <div className="min-w-0 flex-1">
             <h1 className="text-xl font-semibold">{user.name}</h1>
             {user.job_title && <p className="text-sm text-primary">{user.job_title}</p>}
-            {"is_active" in user && (
+            {"is_online" in user || "is_active" in user ? (
               <p className="mt-1 flex items-center gap-2 text-xs text-muted">
-                <span className={`h-2.5 w-2.5 rounded-full ${user.is_active ? "bg-green-500" : "bg-gray-400"}`} />
-                {user.is_active ? "Active" : "Away"}
+                <span className={`h-2.5 w-2.5 rounded-full ${(user.is_online ?? false) ? "bg-green-500" : "bg-gray-400"}`} />
+                {(user.is_online ?? false) ? "Active now" : "Offline"}
               </p>
-            )}
+            ) : null}
           </div>
 
           <button
