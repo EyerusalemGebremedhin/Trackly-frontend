@@ -4,13 +4,14 @@ import { useState, useRef, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import {
   Bot, Send, Plus, User, Image as ImageIcon, Mic, StopCircle,
-  Trash2, Edit2, Check, Menu, X, MoreVertical, Copy,
+  Trash2, Edit2, Check, Menu, X, MoreVertical, Copy, Smile,
 } from "lucide-react";
 import { api } from "@/lib/api";
 import clsx from "clsx";
 import ReactMarkdown from "react-markdown";
 import RequireAuth from "@/components/RequireAuth";
 import { useAuth } from "@/lib/auth-context";
+import EmojiPicker from 'emoji-picker-react';
 
 interface Message {
   id: string;
@@ -58,6 +59,8 @@ function ChatbotContent() {
   const [showMenu, setShowMenu] = useState(false);
   const [showMore, setShowMore] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [showEmoji, setShowEmoji] = useState(false);
+  const textareaRef = useRef<HTMLInputElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -203,6 +206,15 @@ function ChatbotContent() {
     setCopiedId(id);
     setTimeout(() => setCopiedId(null), 1500);
   };
+
+  // Auto-resize textarea
+  useEffect(() => {
+    const ta = textareaRef.current;
+    if (ta) {
+      ta.style.height = "auto";
+      ta.style.height = Math.min(ta.scrollHeight, 128) + "px";
+    }
+  }, [input]);
 
   const handleSend = async (override?: string) => {
     const msg = (override ?? input).trim();
@@ -498,12 +510,43 @@ function ChatbotContent() {
             <button onClick={() => setSelectedImage(null)} className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center text-xs">×</button>
           </div>
         )}
-        <div className="flex items-center gap-1 max-w-3xl mx-auto rounded-2xl border border-border bg-surface px-2 py-1.5 focus-within:ring-1 focus-within:ring-primary">
+        <div className="flex items-center gap-1 max-w-3xl mx-auto rounded-2xl border border-border bg-surface px-2 py-1.5 focus-within:ring-1 focus-within:ring-primary relative">
           <button onClick={() => fileInputRef.current?.click()} className="p-2 hover:bg-background rounded-lg" aria-label="Attach image"><ImageIcon size={17} /></button>
           <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
           <button onClick={toggleRecording} className={clsx("p-2 rounded-lg", isRecording ? "bg-red-500 text-white" : "hover:bg-background")} aria-label="Voice input">{isRecording ? <StopCircle size={17} /> : <Mic size={17} />}</button>
-          <input value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && handleSend()} placeholder="Ask Trackly anything..." className="flex-1 px-2 py-2 text-sm bg-transparent focus:outline-none" />
-          <button onClick={() => handleSend()} disabled={(!input.trim() && !selectedImage) || isLoading} className="w-9 h-9 flex items-center justify-center bg-primary hover:bg-primary-hover text-white rounded-full disabled:opacity-50" aria-label="Send"><Send size={16} /></button>
+          <textarea
+            ref={textareaRef}
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => { if (e.key === "Enter" && e.shiftKey) { e.preventDefault(); handleSend(); } }}
+            placeholder="Ask Trackly anything… (Enter for new line, Shift+Enter to send)"
+            className="flex-1 px-2 py-2 text-sm bg-transparent focus:outline-none resize-none max-h-32"
+            rows={1}
+          />
+          <div className="flex items-center gap-1">
+            <button
+              type="button"
+              onClick={() => setShowEmoji(!showEmoji)}
+              className="p-2 hover:bg-background rounded-lg transition-colors"
+              aria-label="Emojis"
+            >
+              <Smile size={17} />
+            </button>
+            <button onClick={() => handleSend()} disabled={(!input.trim() && !selectedImage) || isLoading} className="w-9 h-9 flex items-center justify-center bg-primary hover:bg-primary-hover text-white rounded-full disabled:opacity-50" aria-label="Send"><Send size={16} /></button>
+          </div>
+          {showEmoji && (
+            <div className="absolute bottom-full left-0 mb-1 z-10">
+              <EmojiPicker
+                onEmojiClick={(e) => setInput(input + e.emoji)}
+                theme="light"
+                showPreview={false}
+                showSkinTones={false}
+                showCategoryButtons={true}
+                perLine={8}
+                i18n={{ categories: { search: '', recent: '', people: '', nature: '', foods: '', activity: '', places: '', objects: '', symbols: '', flags: '' } }}
+              />
+            </div>
+          )}
         </div>
         <p className="text-[11px] text-text-secondary text-center mt-2">Trackly AI can make mistakes. Check important details.</p>
       </div>

@@ -3,13 +3,17 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { Menu, MoreVertical, Send, Trash2, Eraser } from "lucide-react";
+import EmojiPicker from 'emoji-picker-react';
+import { Menu, MoreVertical, Send, Trash2, Eraser, Smile, Image as ImageIcon, Mic, StopCircle, X } from "lucide-react";
 import Avatar from "@/components/Avatar";
+import { mediaUrl } from "@/lib/media";
+
 import { api } from "@/lib/api";
 import { useAuth } from "@/lib/auth-context";
 import { useDmUI, displayName } from "@/components/DmContext";
 
-type Msg = { id: number; sender_id: number; body: string; created_at: string; edited_at?: string | null; deleted_at?: string | null };
+type Msg = { id: number; sender_id: number; body: string; image_url?: string | null; audio_url?: string | null; created_at: string; edited_at?: string | null };
+
 type Confirm = null | "clear" | "delete" | "everyone";
 
 const dayLabel = (iso: string) => {
@@ -38,6 +42,16 @@ export default function ChatPage() {
   const [error, setError] = useState("");
   const [menu, setMenu] = useState(false);
   const [confirm, setConfirm] = useState<Confirm>(null);
+  const [confirmWord, setConfirmWord] = useState("");
+  const [showEmoji, setShowEmoji] = useState(false);
+  const [msgMenu, setMsgMenu] = useState<number | null>(null);
+
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [isRecording, setIsRecording] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const chunksRef = useRef<Blob[]>([]);
   const lastId = useRef(0);
   const bottom = useRef<HTMLDivElement>(null);
 
@@ -62,35 +76,140 @@ export default function ChatPage() {
 
   useEffect(() => { bottom.current?.scrollIntoView({ behavior: "smooth" }); }, [messages.length]);
 
-  async function send() {
-    const body = text.trim();
-    if (!body) return;
-    setText("");
-    await api.post(`/dm/${id}/messages`, { body });
-    load();
-  }
+  // Close emoji picker when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      const picker = document.querySelector('emoji-picker');
+      if (picker && !picker.contains(e.target as Node)) {
+        const btn = document.querySelector('button[aria-label="Emojis"]');
+        if (btn && !btn.contains(e.target as Node)) {
+          setShowEmoji(false);
+        }
+      }
+    };
+    if (showEmoji) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showEmoji]);
 
-  async function removeMessage(mid: number) {
+async function send() {
+    const body = text.trim();
+    if (!body && !selectedImage) return;
+    setText("");
+    const image = selectedImage;
+    setSelectedImage(null);
+    setError("");
+
+    const formData = new FormData();
+    formData.append("body", body);
+    if (image) {
+      const response = await fetch(image);
+      const blob = await response.blob();
+      formData.append("image", blob, "image.png");
+    }
+
     try {
-      await api.delete(`/dm/${id}/messages/${mid}`);
-      setMessages((m) => m.map((x) => (x.id === mid ? { ...x, deleted_at: new Date().toISOString() } : x)));
+      await api.post(`/dm/${id}/messages`, formData);
+      load();
     } catch (e: any) {
-      setError(e?.response?.data?.detail ?? "Could not delete message");
+      setError(e?.message ?? "Could not send message");
     }
   }
 
+  function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => setSelectedImage(reader.result as string);
+      reader.readAsDataURL(file);
+    }
+  }
+
+  async function toggleRecording() {
+    if (isRecording) {
+      mediaRecorderRef.current?.stop();
+      setIsRecording(false);
+      return;
+    }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      chunksRef.current = [];
+      const recorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = recorder;
+      recorder.ondataavailable = (e) => chunksRef.current.push(e.data);
+      recorder.onstop = async () => {
+        const blob = new Blob(chunksRef.current, { type: "audio/webm" });
+        const formData = new FormData();
+        formData.append("audio", blob, "voice-message.webm");
+        setText("");
+        setError("");
+        try {
+          await api.post(`/dm/${id}/messages`, formData);
+          load();
+        } catch (e: any) {
+          setError(e?.message ?? "Could not send voice message");
+        }
+      };
+      recorder.start();
+      setIsRecording(true);
+    } catch (e) {
+      setError("Could not access microphone");
+    }
+  }
+
+  // Auto-resize textarea
+  useEffect(() => {
+    const ta = textareaRef.current;
+    if (ta) {
+      ta.style.height = "auto";
+      ta.style.height = Math.min(ta.scrollHeight, 128) + "px";
+    }
+  }, [text]);
+
+  async function deleteForMe(mid: number) {
+    setMsgMenu(null);
+    if (!window.confirm("Delete this message for you only? It will still be visible to others.")) return;
+    try {
+      await api.delete(`/dm/${id}/messages/${mid}?scope=me`);
+      setMessages((m) => m.filter((x) => x.id !== mid));
+      setError("");
+    } catch (e: any) { setError(e?.message ?? "Could not delete message"); }
+  }
+
+  async function deleteForEveryone(mid: number) {
+    setMsgMenu(null);
+    if (!window.confirm("Delete this message for everyone? This can’t be undone.")) return;
+    const typed = window.prompt('Type "delete" to confirm:');
+    if ((typed ?? "").trim().toLowerCase() !== "delete") return;
+    try {
+      await api.delete(`/dm/${id}/messages/${mid}?scope=everyone`);
+      setMessages((m) => m.filter((x) => x.id !== mid));
+      setError("");
+    } catch (e: any) { setError(e?.message ?? "Could not delete message"); }
+  }
+
   async function runConfirm() {
-    if (confirm === "clear") { await api.post(`/dm/${id}/clear`, {}); setMessages([]); }
+    if (confirm === "clear") {
+      if (confirmWord.trim().toLowerCase() !== "clear") return;
+      await api.post(`/dm/${id}/clear`, {}); setMessages([]);
+    }
     if (confirm === "delete") { await api.delete(`/dm/${id}`); router.push("/messages"); }
     if (confirm === "everyone") { await api.delete(`/dm/${id}?everyone=true`); router.push("/messages"); }
     setConfirm(null);
+    setConfirmWord("");
   }
 
   const isSelf = other && String(other.id) === String(me?.id);
   const name = other ? displayName(other) : "";
 
   const lastOtherId = Math.max(0, ...messages.filter((m) => m.sender_id !== me?.id).map((m) => m.id));
-  const canEdit = (m: Msg) => m.sender_id === me?.id && m.id > lastOtherId;
+  const canDeleteEveryone = (m: Msg) => m.sender_id === me?.id && m.id > lastOtherId;
+  const canEdit = (m: Msg) => {
+    if (m.sender_id !== me?.id) return false;
+    const age = Date.now() - new Date(m.created_at).getTime();
+    return age <= 24 * 3600 * 1000;
+  };
 
   const saveEdit = async (m: Msg) => {
     try {
@@ -142,7 +261,7 @@ export default function ChatPage() {
             <div className="absolute right-0 top-9 z-20 w-56 rounded-lg border border-border bg-surface py-1 text-sm shadow-lg"
                  onMouseLeave={() => setMenu(false)}>
               <button className="flex w-full items-center gap-2 px-3 py-2 hover:bg-primary/5"
-                      onClick={() => { setConfirm("clear"); setMenu(false); }}>
+                      onClick={() => { setConfirm("clear"); setConfirmWord(""); setMenu(false); }}>
                 <Eraser size={15} /> Clear history
               </button>
               <button className="flex w-full items-center gap-2 px-3 py-2 hover:bg-primary/5"
@@ -209,21 +328,37 @@ export default function ChatPage() {
                        <button onClick={() => setEditingId(null)} className="text-xs text-muted">Cancel</button>
                      </div>
                    ) : (
-                     <div className="group flex items-center gap-2">
-                       <p className="text-sm">
-                         {m.deleted_at ? <span className="italic text-muted">This message was deleted</span> : m.body}
-                         {!m.deleted_at && m.edited_at && <span className="ml-1 text-xs text-muted">(edited)</span>}
-                       </p>
-                       {mine && !m.deleted_at && (
-                         <div className="flex gap-2 opacity-0 transition-opacity group-hover:opacity-100">
-                           {canEdit(m) && (
-                             <button onClick={() => { setEditingId(m.id); setDraft(m.body); }} className="text-xs text-muted hover:text-primary">Edit</button>
-                           )}
-                           {canEdit(m) && (
-                             <button onClick={() => removeMessage(m.id)} className="text-xs text-muted hover:text-danger">Delete</button>
-                           )}
-                         </div>
-                       )}
+<div className="group relative flex items-start gap-2">
+                        <div className="min-w-0 flex-1">
+                          {m.image_url && (
+                            <img src={mediaUrl(m.image_url) ?? ""} alt="Shared" className="max-h-32 rounded-lg mb-1" />
+                          )}
+                          {m.audio_url && (
+                            <audio controls src={mediaUrl(m.audio_url) ?? ""} className="w-full max-w-xs mb-1" />
+                          )}
+                          <p className="text-sm">
+                            {m.body}
+                            {m.edited_at && <span className="ml-1 text-xs text-muted">(edited)</span>}
+                          </p>
+                        </div>
+                        {mine && (
+                          <div className="relative shrink-0">
+                            <button type="button" aria-label="Message actions" onClick={() => setMsgMenu(msgMenu === m.id ? null : m.id)} className="rounded p-1 text-muted opacity-70 hover:bg-primary/10 group-hover:opacity-100">
+                              <MoreVertical size={16} />
+                            </button>
+                            {msgMenu === m.id && (
+                              <div className="absolute right-0 top-7 z-20 w-44 rounded-lg border border-border bg-surface py-1 text-sm shadow-lg">
+                                {canEdit(m) && (
+                                  <button className="block w-full px-3 py-2 text-left hover:bg-primary/5" onClick={() => { setEditingId(m.id); setDraft(m.body); setMsgMenu(null); }}>Edit</button>
+                                )}
+                                <button className="block w-full px-3 py-2 text-left hover:bg-primary/5" onClick={() => deleteForMe(m.id)}>Delete</button>
+                                {canDeleteEveryone(m) && (
+                                  <button className="block w-full px-3 py-2 text-left text-danger hover:bg-primary/5" onClick={() => deleteForEveryone(m.id)}>Delete for everyone</button>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        )}
                      </div>
                    )}
                 </div>
@@ -235,36 +370,80 @@ export default function ChatPage() {
       </div>
 
       <div className="shrink-0 border-t border-border p-3">
-        <div className="flex items-end gap-2 rounded-lg border border-border px-3 py-2">
+        {error && <p className="mb-2 text-xs text-danger">{error}</p>}
+        {selectedImage && (
+          <div className="mb-2 relative inline-block">
+            <img src={selectedImage} alt="Selected" className="h-16 rounded-lg" />
+            <button onClick={() => setSelectedImage(null)} className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center text-xs">
+              <X size={10} />
+            </button>
+          </div>
+        )}
+        <div className="flex items-end gap-2 rounded-lg border border-border px-3 py-2 relative">
+          <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+          <button onClick={() => fileInputRef.current?.click()} className="p-1.5 hover:bg-primary/10 rounded-lg transition-colors flex-shrink-0" aria-label="Attach image">
+            <ImageIcon size={18} />
+          </button>
+          <button onClick={toggleRecording} className={`p-1.5 rounded-lg transition-colors flex-shrink-0 ${isRecording ? "bg-red-500 text-white" : "hover:bg-primary/10"}`} aria-label="Voice message">
+            {isRecording ? <StopCircle size={18} /> : <Mic size={18} />}
+          </button>
           <textarea
+            ref={textareaRef}
             value={text}
             rows={1}
             onChange={(e) => setText(e.target.value)}
-            onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } }}
-            placeholder={isSelf ? "Jot something down…" : name ? `Message ${name}` : "Write a message…"}
+            onKeyDown={(e) => { if (e.key === "Enter" && e.shiftKey) { e.preventDefault(); send(); } }}
+            placeholder={isSelf ? "Jot something down…" : name ? `Message ${name}` : "Write a message… (Enter for new line, Shift+Enter to send)"}
             className="max-h-32 flex-1 resize-none bg-transparent text-sm outline-none"
           />
-          <button onClick={send} disabled={!text.trim()} aria-label="Send"
-                  className="rounded-md bg-primary p-2 text-white disabled:opacity-40">
-            <Send size={16} />
-          </button>
+          <div className="flex items-center gap-1">
+            <button
+              type="button"
+              onClick={() => setShowEmoji(!showEmoji)}
+              className="p-1.5 hover:bg-primary/10 rounded-lg transition-colors flex-shrink-0"
+              aria-label="Emojis"
+            >
+              <Smile size={18} />
+            </button>
+            <button onClick={send} disabled={!text.trim() && !selectedImage} aria-label="Send"
+                    className="rounded-md bg-primary p-2 text-white disabled:opacity-40 flex-shrink-0">
+              <Send size={16} />
+            </button>
+          </div>
+          {showEmoji && (
+            <div className="absolute bottom-full right-0 mb-1 z-10 rounded-lg border border-border bg-surface shadow-lg">
+              <div className="flex items-center justify-between border-b border-border px-2 py-1">
+                <span className="text-xs font-medium text-muted">Emoji</span>
+                <button type="button" onClick={() => setShowEmoji(false)} className="rounded p-1 hover:bg-primary/10" aria-label="Close emoji picker">
+                  <X size={14} />
+                </button>
+              </div>
+              <EmojiPicker onEmojiClick={(e) => { setText((t) => t + e.emoji); }} />
+            </div>
+          )}
         </div>
       </div>
 
       {confirm && (
-        <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4" onClick={() => setConfirm(null)}>
+        <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4" onClick={() => { setConfirm(null); setConfirmWord(""); }}>
           <div className="w-full max-w-sm rounded-xl bg-surface p-5" onClick={(e) => e.stopPropagation()}>
             <h3 className="mb-1 font-semibold">
               {confirm === "clear" ? "Clear history?" : confirm === "delete" ? "Delete this chat?" : "Delete for everyone?"}
             </h3>
-            <p className="mb-4 text-sm text-muted">
-              {confirm === "clear" && "Messages are removed for you only."}
+            <p className="mb-3 text-sm text-muted">
+              {confirm === "clear" && "Messages are removed for you only. This can’t be undone."}
               {confirm === "delete" && "It's removed from your list. The other person keeps their copy."}
               {confirm === "everyone" && "This permanently deletes the conversation for both of you."}
             </p>
+            {confirm === "clear" && (
+              <div className="mb-4">
+                <label className="mb-1 block text-xs text-muted">Type <span className="font-semibold text-foreground">clear</span> to confirm</label>
+                <input value={confirmWord} onChange={(e) => setConfirmWord(e.target.value)} placeholder="clear" className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm" autoFocus />
+              </div>
+            )}
             <div className="flex justify-end gap-2">
-              <button className="rounded-md border border-border px-3 py-2 text-sm" onClick={() => setConfirm(null)}>Cancel</button>
-              <button className="rounded-md bg-primary px-3 py-2 text-sm text-white" onClick={runConfirm}>Confirm</button>
+              <button className="rounded-md border border-border px-3 py-2 text-sm" onClick={() => { setConfirm(null); setConfirmWord(""); }}>Cancel</button>
+              <button className="rounded-md bg-primary px-3 py-2 text-sm text-white disabled:opacity-40" onClick={runConfirm} disabled={confirm === "clear" && confirmWord.trim().toLowerCase() !== "clear"}>Confirm</button>
             </div>
           </div>
         </div>

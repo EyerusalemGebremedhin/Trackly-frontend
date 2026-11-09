@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { Clock, User, CheckCircle2 } from "lucide-react";
+import { Clock, User, CheckCircle2, HandHelping } from "lucide-react";
 import Link from "next/link";
 import { api, ApiError } from "@/lib/api";
+import { useAuth } from "@/lib/auth-context";
 import type { Task, TaskStatus, TaskPeriodType } from "@/lib/types";
+import HelpRequestModal from "@/components/HelpRequestModal";
 
 const COLUMNS: { key: TaskStatus; label: string }[] = [
   { key: "todo", label: "To be done" },
@@ -23,11 +25,15 @@ const STATUS_LABEL: Record<TaskStatus, string> = {
   done: "Done",
 };
 
-function GroupTaskCard({ task, onChanged, members }: { task: Task; onChanged: () => void; members?: any[] }) {
+function GroupTaskCard({ task, onChanged, members, groupId }: { task: Task; onChanged: () => void; members?: any[]; groupId?: number }) {
+  const { user } = useAuth();
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
   const overdue = task.deadline && task.status !== "done" && new Date(task.deadline) < new Date();
   const assignee = members?.find(m => m.user_id === task.assignee_id);
+  const gid = task.group_id ?? groupId;
+  const isMine = String(task.assignee_id) === String((user as any)?.id);
 
   async function patch(body: Record<string, unknown>) {
     setBusy(true);
@@ -75,7 +81,7 @@ function GroupTaskCard({ task, onChanged, members }: { task: Task; onChanged: ()
 
       {error && <p className="text-xs text-danger">{error}</p>}
 
-      <div className="pt-1">
+      <div className="flex items-center justify-between gap-2 pt-1">
         <select
           value={task.status}
           disabled={busy}
@@ -88,7 +94,15 @@ function GroupTaskCard({ task, onChanged, members }: { task: Task; onChanged: ()
             </option>
           ))}
         </select>
+        {isMine && gid && (
+          <button type="button" onClick={() => setHelpOpen(true)} title="Request help with this task" className="flex items-center gap-1 text-xs text-primary hover:text-primary-hover">
+            <HandHelping size={13} /> Help
+          </button>
+        )}
       </div>
+      {helpOpen && gid && (
+        <HelpRequestModal groupId={gid} taskId={task.id} onClose={() => setHelpOpen(false)} onDone={() => { setHelpOpen(false); onChanged(); }} />
+      )}
     </div>
   );
 }
@@ -135,7 +149,7 @@ export default function GroupTaskBoard({ tasks, onChanged, members, doneCount = 
             </div>
             <div className="space-y-2 min-h-[60px]">
               {colTasks.map((t) => (
-                <GroupTaskCard key={t.id} task={t} onChanged={onChanged} members={members} />
+                <GroupTaskCard key={t.id} task={t} onChanged={onChanged} members={members} groupId={groupId} />
               ))}
               {colTasks.length === 0 && (
                 <div className="border border-dashed border-hairline rounded-md p-3 text-center text-xs text-muted">

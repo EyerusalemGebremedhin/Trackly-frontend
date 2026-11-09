@@ -1,10 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { Clock, Archive, CheckCircle2 } from "lucide-react";
+import { Clock, Archive, CheckCircle2, HandHelping } from "lucide-react";
 import Link from "next/link";
 import { api, ApiError } from "@/lib/api";
 import type { Task, TaskStatus, TaskPeriodType } from "@/lib/types";
+import HelpRequestModal from "@/components/HelpRequestModal";
 
 const COLUMNS: { key: TaskStatus; label: string }[] = [
   { key: "todo", label: "To be done" },
@@ -26,6 +27,7 @@ const STATUS_LABEL: Record<TaskStatus, string> = {
 function PlanCard({ task, onChanged }: { task: Task; onChanged: () => void }) {
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
   const overdue = task.deadline && task.status !== "done" && new Date(task.deadline) < new Date();
   const isPersonal = task.group_id === null;
 
@@ -101,17 +103,38 @@ function PlanCard({ task, onChanged }: { task: Task; onChanged: () => void }) {
           ))}
         </select>
 
-        {task.status === "done" && isPersonal && (
-          <button
-            onClick={moveToPast}
-            disabled={busy}
-            title="Move to Past plans"
-            className="flex items-center gap-1 text-xs text-muted hover:text-primary"
-          >
-            <Archive size={12} /> Move to Past
-          </button>
-        )}
+        <div className="flex items-center gap-2">
+          {!isPersonal && task.group_id && (
+            <button
+              type="button"
+              onClick={() => setHelpOpen(true)}
+              disabled={busy}
+              title="Request help with this task"
+              className="flex items-center gap-1 text-xs text-primary hover:text-primary-hover"
+            >
+              <HandHelping size={13} /> Help
+            </button>
+          )}
+          {task.status === "done" && isPersonal && (
+            <button
+              onClick={moveToPast}
+              disabled={busy}
+              title="Move to Past plans"
+              className="flex items-center gap-1 text-xs text-muted hover:text-primary"
+            >
+              <Archive size={12} /> Move to Past
+            </button>
+          )}
+        </div>
       </div>
+      {helpOpen && task.group_id && (
+        <HelpRequestModal
+          groupId={task.group_id}
+          taskId={task.id}
+          onClose={() => setHelpOpen(false)}
+          onDone={() => { setHelpOpen(false); onChanged(); }}
+        />
+      )}
     </div>
   );
 }
