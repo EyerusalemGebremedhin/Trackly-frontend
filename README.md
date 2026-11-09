@@ -2,8 +2,6 @@
 
 Next.js frontend for **Trackly** (dashboard, tasks, groups & discussion, direct messages, profile, check-ins, AI chat/insights).
 
-> Repo: `Trackly-frontend` — this README is shown on the repository home page.
-
 ## Stack
 - **Next.js** (App Router) + React + TypeScript
 - Tailwind CSS, `lucide-react` icons
@@ -25,7 +23,7 @@ npm run lint
 ```
 
 ## Environment
-Point the app at the Trackly API (variable name may be `NEXT_PUBLIC_API_URL` or similar — check `lib/api.ts` / `.env*` in this repo). Example:
+Point the app at the Trackly API (variable name may be `NEXT_PUBLIC_API_URL` or similar, check `lib/api.ts` / `.env*` in this repo). Example:
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:8000
 ```
