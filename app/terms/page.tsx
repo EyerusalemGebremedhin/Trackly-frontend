@@ -7,7 +7,7 @@ export default function TermsPage() {
   return (
     <div className="min-h-screen bg-background py-12 px-4">
       <div className="max-w-3xl mx-auto">
-        <Link href="/signup" className="flex items-center gap-2 text-primary hover:underline mb-8">
+        <Link href="/signup" className="inline-flex items-center gap-2 text-primary hover:underline mb-8 min-h-[44px]">
           <ArrowLeft size={16} />
           Back to Sign Up
         </Link>

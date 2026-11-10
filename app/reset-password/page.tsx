@@ -22,7 +22,11 @@ function ResetForm() {
     e.preventDefault();
     setError(null);
     if (password !== confirm) {
-      setError("The two passwords don't match.");
+      setError("Passwords do not match.");
+      return;
+    }
+    if (password.length < 8) {
+      setError("Password must be at least 8 characters.");
       return;
     }
     setLoading(true);
@@ -83,8 +87,8 @@ function ResetForm() {
         icon={Lock}
         type="password"
         required
-        minLength={6}
-        placeholder="At least 6 characters"
+        minLength={8}
+        placeholder="At least 8 characters"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
       />
@@ -94,7 +98,7 @@ function ResetForm() {
         icon={Lock}
         type="password"
         required
-        minLength={6}
+        minLength={8}
         placeholder="Type it again"
         value={confirm}
         onChange={(e) => setConfirm(e.target.value)}

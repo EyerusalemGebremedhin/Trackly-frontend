@@ -86,9 +86,11 @@ export default function GroupPage() {
     const confirmText = prompt("Type 'delete' to confirm deleting this team (this action cannot be undone):");
     if (confirmText !== "delete") return;
     try {
-      await api.del(`/groups/${groupId}`);
+      await api.del(`/groups/${groupId}?reason=${encodeURIComponent("Team deleted by lead")}`);
       router.push("/groups");
-    } catch (e) {}
+    } catch (e) {
+      alert(e instanceof ApiError ? e.message : "Failed to delete team");
+    }
   }
 
   async function sendInvite(e: React.FormEvent) {
@@ -137,54 +139,55 @@ export default function GroupPage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap min-w-0">
             {editingGroup && isLead ? (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <input
+                  aria-label="Group name"
                   value={groupName}
                   onChange={(e) => setGroupName(e.target.value)}
-                  className="text-2xl sm:text-3xl font-bold px-2 py-1 border border-hairline rounded-md bg-paper font-serif text-accent"
+                  className="text-2xl sm:text-3xl font-bold px-2 py-1 border border-hairline rounded-md bg-paper font-serif text-accent max-w-full"
                 />
-                <button onClick={updateGroupName} className="p-1 text-success"><Check size={20} /></button>
-                <button onClick={() => { setEditingGroup(false); setGroupName(group.name); }} className="p-1 text-danger"><X size={20} /></button>
+                <button onClick={updateGroupName} aria-label="Save group name" className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center text-success"><Check size={20} /></button>
+                <button onClick={() => { setEditingGroup(false); setGroupName(group.name); }} aria-label="Cancel editing group name" className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center text-danger"><X size={20} /></button>
               </div>
             ) : (
               <>
-                <h1 className="font-serif text-3xl text-accent">{group.name}</h1>
-              <Link href={`/discussion/${groupId}`} className="flex items-center gap-1.5 text-sm text-primary hover:underline mt-1">
+                <h1 className="font-serif text-3xl text-accent break-words">{group.name}</h1>
+              <Link href={`/discussion/${groupId}`} className="flex items-center gap-1.5 text-sm text-primary hover:underline mt-1 min-h-[44px]">
                 <MessagesSquare size={14} /> Discussion
               </Link>
                 {isLead && (
-                  <button onClick={() => setEditingGroup(true)} className="p-1 hover:bg-blush rounded">
+                  <button onClick={() => setEditingGroup(true)} aria-label="Edit group name" className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center hover:bg-blush rounded">
                     <Edit2 size={18} />
                   </button>
                 )}
               </>
             )}
           </div>
-        <div className="flex items-center gap-2">
-          <button onClick={() => setHelpOpen(true)} className="flex items-center gap-1 px-3 py-1.5 border border-hairline rounded-md text-sm hover:bg-paper">
+        <div className="flex items-center gap-2 flex-wrap w-full sm:w-auto">
+          <button onClick={() => setHelpOpen(true)} className="flex items-center justify-center gap-1 px-3 py-2 min-h-[44px] border border-hairline rounded-md text-sm hover:bg-paper flex-1 sm:flex-none">
             <HandHelping size={16} />
             Request Help
           </button>
-          <Link href={`/completed?group=${groupId}`} className="flex items-center gap-1 px-3 py-1.5 border border-hairline rounded-md text-sm hover:bg-paper">
+          <Link href={`/completed?group=${groupId}`} className="flex items-center justify-center gap-1 px-3 py-2 min-h-[44px] border border-hairline rounded-md text-sm hover:bg-paper flex-1 sm:flex-none">
             Completed Tasks
           </Link>
           {isLead && (
             <>
-              <button onClick={() => setInviteOpen(true)} className="flex items-center gap-1 px-3 py-1.5 border border-hairline rounded-md text-sm hover:bg-paper">
+              <button onClick={() => setInviteOpen(true)} className="flex items-center justify-center gap-1 px-3 py-2 min-h-[44px] border border-hairline rounded-md text-sm hover:bg-paper flex-1 sm:flex-none">
                 <Mail size={16} />
                 Add Member
               </button>
-              <button onClick={() => setAssignOpen(true)} className="flex items-center gap-1 px-3 py-1.5 bg-primary text-white rounded-md text-sm hover:bg-primary-hover">
+              <button onClick={() => setAssignOpen(true)} className="flex items-center justify-center gap-1 px-3 py-2 min-h-[44px] bg-primary text-white rounded-md text-sm hover:bg-primary-hover flex-1 sm:flex-none">
                 <UserPlus size={16} />
                 Assign Task
               </button>
-              <button onClick={archiveGroup} className="flex items-center gap-1 px-3 py-1.5 border border-hairline rounded-md text-sm hover:bg-paper">
+              <button onClick={archiveGroup} className="flex items-center justify-center gap-1 px-3 py-2 min-h-[44px] border border-hairline rounded-md text-sm hover:bg-paper flex-1 sm:flex-none">
                 <Archive size={16} />
                 Archive
               </button>
-              <button onClick={deleteGroup} className="flex items-center gap-1 px-3 py-1.5 bg-danger-bg text-danger border border-danger/30 rounded-md text-sm hover:bg-danger/10">
+              <button onClick={deleteGroup} className="flex items-center justify-center gap-1 px-3 py-2 min-h-[44px] bg-danger-bg text-danger border border-danger/30 rounded-md text-sm hover:bg-danger/10 flex-1 sm:flex-none">
                 <Trash2 size={16} />
                 Delete
               </button>
@@ -320,37 +323,37 @@ export default function GroupPage() {
         <HelpRequestModal groupId={groupId} onClose={() => setHelpOpen(false)} onDone={load} />
       )}
       {inviteOpen && (
-        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={() => setInviteOpen(false)}>
-          <div className="bg-surface rounded-lg shadow-lg max-w-md w-full p-5 border border-hairline" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-serif text-lg text-accent">Invite Team Member</h3>
-              <button onClick={() => setInviteOpen(false)} className="text-muted hover:text-ink"><X size={18} /></button>
+        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={() => setInviteOpen(false)} onKeyDown={(e) => e.key === "Escape" && setInviteOpen(false)}>
+          <div role="dialog" aria-modal="true" aria-labelledby="invite-title" className="bg-surface rounded-lg shadow-lg max-w-md w-full max-h-[90vh] overflow-y-auto p-5 border border-hairline" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4 gap-3">
+              <h3 id="invite-title" className="font-serif text-lg text-accent">Invite Team Member</h3>
+              <button onClick={() => setInviteOpen(false)} aria-label="Close invite dialog" className="text-muted hover:text-ink min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded"><X size={18} /></button>
             </div>
             <form onSubmit={sendInvite} className="space-y-3">
               <div>
-                <label className="text-xs text-muted block mb-1">First Name *</label>
-                <input required value={inviteForm.firstName} onChange={(e) => setInviteForm({...inviteForm, firstName: e.target.value})} className="w-full border border-hairline rounded-md px-3 py-2 text-sm" />
+                <label htmlFor="invite-first" className="text-xs text-muted block mb-1">First Name *</label>
+                <input id="invite-first" required value={inviteForm.firstName} onChange={(e) => setInviteForm({...inviteForm, firstName: e.target.value})} className="w-full border border-hairline rounded-md px-3 py-2 text-sm min-h-[44px]" />
               </div>
               <div>
-                <label className="text-xs text-muted block mb-1">Last Name</label>
-                <input value={inviteForm.lastName} onChange={(e) => setInviteForm({...inviteForm, lastName: e.target.value})} className="w-full border border-hairline rounded-md px-3 py-2 text-sm" />
+                <label htmlFor="invite-last" className="text-xs text-muted block mb-1">Last Name</label>
+                <input id="invite-last" value={inviteForm.lastName} onChange={(e) => setInviteForm({...inviteForm, lastName: e.target.value})} className="w-full border border-hairline rounded-md px-3 py-2 text-sm min-h-[44px]" />
               </div>
               <div>
-                <label className="text-xs text-muted block mb-1">Email Address *</label>
-                <input type="email" required value={inviteForm.email} onChange={(e) => setInviteForm({...inviteForm, email: e.target.value})} className="w-full border border-hairline rounded-md px-3 py-2 text-sm" />
+                <label htmlFor="invite-email" className="text-xs text-muted block mb-1">Email Address *</label>
+                <input id="invite-email" type="email" required value={inviteForm.email} onChange={(e) => setInviteForm({...inviteForm, email: e.target.value})} className="w-full border border-hairline rounded-md px-3 py-2 text-sm min-h-[44px]" />
               </div>
               <div>
-                <label className="text-xs text-muted block mb-1">Role (free text)</label>
-                <input value={inviteForm.role || ""} onChange={(e) => setInviteForm({...inviteForm, role: e.target.value})} className="w-full border border-hairline rounded-md px-3 py-2 text-sm" placeholder="e.g. Developer, Designer" />
+                <label htmlFor="invite-role" className="text-xs text-muted block mb-1">Role (free text)</label>
+                <input id="invite-role" value={inviteForm.role || ""} onChange={(e) => setInviteForm({...inviteForm, role: e.target.value})} className="w-full border border-hairline rounded-md px-3 py-2 text-sm min-h-[44px]" placeholder="e.g. Developer, Designer" />
               </div>
               <div>
-                <label className="text-xs text-muted block mb-1">Reason for adding (visible to group)</label>
-                <input value={inviteForm.inviteReason || ""} onChange={(e) => setInviteForm({...inviteForm, inviteReason: e.target.value})} className="w-full border border-hairline rounded-md px-3 py-2 text-sm" placeholder="Why this member is being added" />
+                <label htmlFor="invite-reason" className="text-xs text-muted block mb-1">Reason for adding (visible to group)</label>
+                <input id="invite-reason" value={inviteForm.inviteReason || ""} onChange={(e) => setInviteForm({...inviteForm, inviteReason: e.target.value})} className="w-full border border-hairline rounded-md px-3 py-2 text-sm min-h-[44px]" placeholder="Why this member is being added" />
               </div>
               {inviteMsg && <p className={`text-xs ${inviteMsg.includes('sent') ? 'text-success' : 'text-danger'}`}>{inviteMsg}</p>}
-              <div className="flex justify-end gap-2 pt-2">
-                <button type="button" onClick={() => setInviteOpen(false)} className="px-3 py-1.5 text-sm border border-hairline rounded-md">Cancel</button>
-                <button disabled={inviteLoading} className="px-3 py-1.5 text-sm bg-primary text-white rounded-md disabled:opacity-60">{inviteLoading ? "Sending..." : "Send Invitation"}</button>
+              <div className="flex flex-wrap justify-end gap-2 pt-2">
+                <button type="button" onClick={() => setInviteOpen(false)} className="px-3 py-2 text-sm border border-hairline rounded-md min-h-[44px]">Cancel</button>
+                <button disabled={inviteLoading} className="px-3 py-2 text-sm bg-primary text-white rounded-md disabled:opacity-60 min-h-[44px]">{inviteLoading ? "Sending..." : "Send Invitation"}</button>
               </div>
             </form>
           </div>

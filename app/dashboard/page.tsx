@@ -110,37 +110,19 @@ export default function DashboardPage() {
   return (
     <div className="mx-auto w-full max-w-[1500px] space-y-14">
   <section className="overflow-hidden rounded-3xl border bg-surface shadow-lg">
-    <div className="relative h-[320px] overflow-hidden bg-gradient-to-br from-[#2e0410] to-[#8a2238] md:h-[480px]">
-      {HERO_IMAGES.map((h, i) => (
-        <div key={h.src} className={`absolute inset-0 bg-cover transition-opacity duration-1000 ${i === heroIdx ? "opacity-100" : "opacity-0"}`} style={{ backgroundImage: `url("${encodeURI(h.src)}")`, backgroundPosition: h.pos }} />
-      ))}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
-      <button type="button" onClick={() => setHeroIdx((i) => (i - 1 + HERO_IMAGES.length) % HERO_IMAGES.length)} aria-label="Previous picture" className="absolute left-4 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full bg-white/80 text-[#3d0612] shadow transition hover:bg-white">
-        <ChevronLeft size={20} />
-      </button>
-      <button type="button" onClick={() => setHeroIdx((i) => (i + 1) % HERO_IMAGES.length)} aria-label="Next picture" className="absolute right-4 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full bg-white/80 text-[#3d0612] shadow transition hover:bg-white">
-        <ChevronRight size={20} />
-      </button>
-      <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 gap-2">
-        {HERO_IMAGES.map((_, i) => (
-          <button key={i} type="button" onClick={() => setHeroIdx(i)} aria-label={`Show picture ${i + 1}`} className={`h-2 rounded-full transition-all ${i === heroIdx ? "w-6 bg-white" : "w-2 bg-white/60"}`} />
-        ))}
-      </div>
-    </div>
-
     <div className="relative grid items-center gap-6 p-6 md:grid-cols-[1fr_auto] md:p-8">
       <div>
         <h1 className="font-serif text-3xl text-accent md:text-4xl">{greeting} {firstName}</h1>
         <p className="mt-2 font-medium">{summary}</p>
         <p className="mt-1 max-w-xl text-sm text-muted">Trackly helps you plan your work, check in every day, and grow with your team, all in one place.</p>
         <div className="mt-5 flex flex-wrap gap-3">
-          <button type="button" onClick={() => setNewPlanOpen(true)} className="inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-white transition hover:opacity-90">
+          <button type="button" onClick={() => setNewPlanOpen(true)} className="inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 min-h-[44px] text-sm font-semibold text-white transition hover:opacity-90">
             <Plus size={16} /> New plan
           </button>
-          <Link href="/tasks" className="inline-flex items-center gap-2 rounded-full border px-5 py-2.5 text-sm font-medium transition hover:bg-black/5">
+          <Link href="/tasks" className="inline-flex items-center gap-2 rounded-full border px-5 py-2.5 min-h-[44px] text-sm font-medium transition hover:bg-black/5">
             Open my tasks <ArrowRight size={16} />
           </Link>
-          <Link href="/messages" className="inline-flex items-center gap-2 rounded-full border px-5 py-2.5 text-sm font-medium transition hover:bg-black/5">
+          <Link href="/messages" className="inline-flex items-center gap-2 rounded-full border px-5 py-2.5 min-h-[44px] text-sm font-medium transition hover:bg-black/5">
             Messages
           </Link>
         </div>
@@ -148,6 +130,24 @@ export default function DashboardPage() {
       <div className="mx-auto flex flex-col items-center gap-2 rounded-2xl bg-gradient-to-br from-[#2e0410] to-[#8a2238] p-5">
         <Ring value={Number(dash.completion_rate) || 0} />
         <p className="text-xs text-white/80">{dash.done_tasks} of {dash.total_tasks} tasks done</p>
+      </div>
+    </div>
+
+    <div className="relative h-[220px] overflow-hidden bg-gradient-to-br from-[#2e0410] to-[#8a2238] sm:h-[320px] md:h-[420px]" aria-hidden="true">
+      {HERO_IMAGES.map((h, i) => (
+        <div key={h.src} className={`absolute inset-0 bg-cover transition-opacity duration-1000 ${i === heroIdx ? "opacity-100" : "opacity-0"}`} style={{ backgroundImage: `url("${encodeURI(h.src)}")`, backgroundPosition: h.pos }} />
+      ))}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
+      <button type="button" onClick={() => setHeroIdx((i) => (i - 1 + HERO_IMAGES.length) % HERO_IMAGES.length)} aria-label="Previous picture" className="absolute left-4 top-1/2 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full bg-white/80 text-[#3d0612] shadow transition hover:bg-white">
+        <ChevronLeft size={20} />
+      </button>
+      <button type="button" onClick={() => setHeroIdx((i) => (i + 1) % HERO_IMAGES.length)} aria-label="Next picture" className="absolute right-4 top-1/2 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full bg-white/80 text-[#3d0612] shadow transition hover:bg-white">
+        <ChevronRight size={20} />
+      </button>
+      <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 gap-2">
+        {HERO_IMAGES.map((_, i) => (
+          <button key={i} type="button" onClick={() => setHeroIdx(i)} aria-label={`Show picture ${i + 1}`} className={`h-2.5 rounded-full transition-all ${i === heroIdx ? "w-7 bg-white" : "w-2.5 bg-white/60"}`} />
+        ))}
       </div>
     </div>
   </section>

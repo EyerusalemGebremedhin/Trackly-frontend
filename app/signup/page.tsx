@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Mail, Lock, User, ArrowRight } from "lucide-react";
 import { api } from "@/lib/api";
@@ -8,12 +8,30 @@ import { useRouter } from "next/navigation";
 import AuthSplitLayout from "@/components/AuthSplitLayout";
 import AuthField from "@/components/AuthField";
 
+const SIGNUP_DRAFT_KEY = "trackly_signup_draft";
+
 export default function SignupPage() {
   const router = useRouter();
   const [form, setForm] = useState({ firstName: "", lastName: "", email: "", password: "", confirmPassword: "" });
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [agreed, setAgreed] = useState(false);
+
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem(SIGNUP_DRAFT_KEY);
+      if (!raw) return;
+      const draft = JSON.parse(raw);
+      setForm((f) => ({ ...f, firstName: draft.firstName || "", lastName: draft.lastName || "", email: draft.email || "" }));
+      setAgreed(!!draft.agreed);
+    } catch {}
+  }, []);
+
+  useEffect(() => {
+    try {
+      sessionStorage.setItem(SIGNUP_DRAFT_KEY, JSON.stringify({ firstName: form.firstName, lastName: form.lastName, email: form.email, agreed }));
+    } catch {}
+  }, [form.firstName, form.lastName, form.email, agreed]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -32,8 +50,9 @@ export default function SignupPage() {
     }
     setLoading(true);
     try {
-      const name = `${form.firstName} ${form.lastName}`.trim();
+      const name = `${form.firstName.trim()} ${form.lastName.trim()}`.trim().replace(/\s+/g, " ");
       await api.post("/auth/register", { name, email: form.email, password: form.password, skills: "" });
+      try { sessionStorage.removeItem(SIGNUP_DRAFT_KEY); } catch {}
       router.push(`/verify-email?email=${encodeURIComponent(form.email)}`);
     } catch (err: any) {
       setError(err?.message || "Signup failed");
@@ -55,7 +74,7 @@ export default function SignupPage() {
           </div>
         )}
 
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <AuthField
             label="First name"
             icon={User}
@@ -70,7 +89,7 @@ export default function SignupPage() {
             label="Last name"
             icon={User}
             required
-            placeholder="Last name"
+            placeholder="Last name (including middle/compound names)"
             value={form.lastName}
             onChange={(e) => setForm({ ...form, lastName: e.target.value })}
             autoComplete="family-name"
@@ -119,7 +138,7 @@ export default function SignupPage() {
             type="checkbox"
             checked={agreed}
             onChange={(e) => setAgreed(e.target.checked)}
-            className="mt-0.5"
+            className="mt-1 h-4 w-4"
           />
           <span className="text-muted">
             I agree to the{" "}
@@ -132,7 +151,7 @@ export default function SignupPage() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full flex items-center justify-center gap-2 bg-primary text-white rounded-md px-4 py-2.5 text-sm font-medium hover:bg-primary-hover transition-colors disabled:opacity-50"
+          className="w-full flex items-center justify-center gap-2 bg-primary text-white rounded-md px-4 py-3 min-h-[44px] text-sm font-medium hover:bg-primary-hover transition-colors disabled:opacity-50"
         >
           {loading ? "Creating account..." : "Create account"}
           <ArrowRight size={16} />

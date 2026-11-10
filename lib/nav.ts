@@ -6,7 +6,7 @@ export const navItems = [
   { href: "/groups",      label: "Groups",          icon: Users, primary: true },
   { href: "/discussion",  label: "Discussion",      icon: MessagesSquare, primary: true },
   { href: "/messages",    label: "Direct Messages", icon: MessageCircle },
-  { href: "/performance", label: "Performance",     icon: Trophy },
+  { href: "/leaderboard", label: "Performance",     icon: Trophy },
   { href: "/metrics",     label: "Metrics",         icon: BarChart3 },
   { href: "/chatbot",    label: "Talk to Trackly", icon: Bot },
 ];
